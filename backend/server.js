@@ -21,10 +21,10 @@ app.get('/health', (req, res) => {
 app.get("/api/get-signed-url", async (req, res) => {
     try {
         const response = await fetch(
-            `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${process.env.ELEVENLABS_AGENT_ID}`,
+            `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${process.env.VITE_ELEVENLABS_AGENT_ID}`,
             {
                 headers: {
-                    "xi-api-key": process.env.ELEVENLABS_API_KEY,
+                    "xi-api-key": process.env.VITE_ELEVENLABS_API_KEY,
                 },
             }
         );
