@@ -1,2 +1,2 @@
-// Frontend entry point
-console.log('PCR Emergency Call System - Frontend initialized');
+// Simplified frontend script for frontend folder
+console.log('Frontend folder script - minimal version');
