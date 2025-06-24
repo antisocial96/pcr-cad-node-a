@@ -1,10 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-import { backendConfig } from './config.js';
-import { handlePostCallWebhook, webhookHealthCheck } from './webhooks/elevenlabs.js';
+import { config } from 'dotenv';
+
+// Load environment variables
+config();
 
 const app = express();
-const PORT = backendConfig.port;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
@@ -15,18 +17,14 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'PCR Backend is running' });
 });
 
-// Webhook endpoints
-app.post('/api/webhook/elevenlabs/post-call', handlePostCallWebhook);
-app.get('/api/webhook/elevenlabs/health', webhookHealthCheck);
-
 // ElevenLabs signed URL endpoint
 app.get("/api/get-signed-url", async (req, res) => {
     try {
         const response = await fetch(
-            `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${backendConfig.elevenlabsAgentId}`,
+            `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${process.env.VITE_ELEVENLABS_AGENT_ID}`,
             {
                 headers: {
-                    "xi-api-key": backendConfig.elevenlabsApiKey,
+                    "xi-api-key": process.env.VITE_ELEVENLABS_API_KEY,
                 },
             }
         );
@@ -46,6 +44,4 @@ app.get("/api/get-signed-url", async (req, res) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`PCR Backend server running on http://localhost:${PORT}`);
-  console.log(`Webhook endpoint: http://localhost:${PORT}/api/webhook/elevenlabs/post-call`);
-  console.log(`Webhook health check: http://localhost:${PORT}/api/webhook/elevenlabs/health`);
 });
