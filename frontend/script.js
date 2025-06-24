@@ -14,7 +14,7 @@ async function startConversation() {
 
         // Start the conversation
         conversation = await Conversation.startSession({
-            agentId: 'YOUR_AGENT_ID', // Replace with your agent ID
+            agentId: import.meta.env.VITE_ELEVENLABS_AGENT_ID,
             onConnect: () => {
                 connectionStatus.textContent = 'Connected';
                 connectionStatus.style.color = '#10b981';
