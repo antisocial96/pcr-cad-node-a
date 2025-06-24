@@ -1,9 +1,10 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  root: 'frontend',
+  root: '.',
+  publicDir: 'frontend',
   build: {
-    outDir: '../dist'
+    outDir: 'dist'
   },
   server: {
     port: 5173,
