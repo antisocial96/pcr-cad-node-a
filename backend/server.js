@@ -131,6 +131,11 @@ app.post("/api/webhook/elevenlabs/post-call", async (req, res) => {
                 const updatedCall = await garudaSentryCalls.updateFromWebhook(conversationId, webhookData);
                 console.log('Updated call record with webhook data:', updatedCall);
                 
+                // Log the extracted intent for debugging
+                if (webhookData.analysis?.data_collection_results?.intent) {
+                    console.log('Extracted intent from webhook:', webhookData.analysis.data_collection_results.intent);
+                }
+                
                 return res.status(200).json({ 
                     received: true,
                     success: true, 
@@ -144,7 +149,7 @@ app.post("/api/webhook/elevenlabs/post-call", async (req, res) => {
                 
                 const newCallData = {
                     conversation_id: conversationId,
-                    intent: webhookData.status || 'webhook_received',
+                   intent: webhookData.analysis?.data_collection_results?.intent || webhookData.status || 'webhook_received',
                     caller_phone: webhookData.caller_phone || webhookData.phone_number || null
                 };
                 

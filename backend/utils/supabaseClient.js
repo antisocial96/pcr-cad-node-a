@@ -113,21 +113,12 @@ export const garudaSentryCalls = {
   async updateFromWebhook(conversationId, webhookData) {
     const updateData = {};
     
-    // Map webhook status to intent
-    if (webhookData.status) {
-      switch (webhookData.status) {
-        case 'completed':
-          updateData.intent = 'call_completed';
-          break;
-        case 'failed':
-          updateData.intent = 'call_failed';
-          break;
-        case 'timeout':
-          updateData.intent = 'call_timeout';
-          break;
-        default:
-          updateData.intent = webhookData.status;
-      }
+    // Extract intent from data.analysis.data_collection_results.intent
+    if (webhookData.analysis?.data_collection_results?.intent) {
+      updateData.intent = webhookData.analysis.data_collection_results.intent;
+    } else if (webhookData.status) {
+      // Fallback to status if intent not found in expected path
+      updateData.intent = webhookData.status;
     }
 
     // Extract caller phone if available in webhook data
