@@ -9,14 +9,25 @@ const agentStatus = document.getElementById('agentStatus');
 let conversation;
 let currentCallRecord = null;
 
+async function getSignedUrl() {
+    const response = await fetch('http://localhost:3001/api/get-signed-url');
+    if (!response.ok) {
+        throw new Error(`Failed to get signed url: ${response.statusText}`);
+    }
+    const { signedUrl } = await response.json();
+    return signedUrl;
+}
+
 async function startConversation() {
     try {
         // Request microphone permission
         await navigator.mediaDevices.getUserMedia({ audio: true });
 
+        const signedUrl = await getSignedUrl();
+
         // Start the conversation
         conversation = await Conversation.startSession({
-            agentId: import.meta.env.ELEVENLABS_AGENT_ID,
+            signedUrl,
             onConnect: () => {
                 // Create a call record when conversation starts
                 createCallRecord();
@@ -34,7 +45,7 @@ async function startConversation() {
                 console.log('PCR CAD Voice AI: Disconnected from conversation');
             },
             onError: (error) => {
-                console.error('PCR CAD Voice AI Error:', error);
+                console.error('Error:', error);
                 connectionStatus.textContent = 'Error';
                 connectionStatus.style.color = '#ef4444';
                 startButton.disabled = false;
