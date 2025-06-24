@@ -23,6 +23,18 @@ router.get('/', async (req, res) => {
   }
 });
 
+// POST /api/calls - Create new garuda sentry call
+router.post('/', async (req, res) => {
+  try {
+    const callData = req.body;
+    const call = await garudaSentryCallsDB.create(callData);
+    res.json({ success: true, data: call });
+  } catch (error) {
+    console.error('Error creating call:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // GET /api/calls/:conversationId - Get specific call by conversation ID
 router.get('/:conversationId', async (req, res) => {
   try {
