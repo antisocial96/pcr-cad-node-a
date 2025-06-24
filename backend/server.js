@@ -101,6 +101,76 @@ app.post("/api/webhook/elevenlabs/post-call", async (req, res) => {
     }
 });
 
+// Create call record endpoint
+app.post("/api/calls/create", async (req, res) => {
+    try {
+        console.log('Creating new call record:', req.body);
+        
+        const callData = req.body;
+        
+        // Validate required fields
+        if (!callData.conversation_id) {
+            return res.status(400).json({ error: 'Missing conversation_id' });
+        }
+        
+        const newCall = await garudaSentryCalls.create(callData);
+        console.log('Created call record:', newCall);
+        
+        res.status(201).json(newCall);
+        
+    } catch (error) {
+        console.error('Error creating call record:', error);
+        res.status(500).json({ 
+            error: 'Failed to create call record',
+            details: error.message
+        });
+    }
+});
+
+// Update call intent endpoint
+app.put("/api/calls/:conversationId/intent", async (req, res) => {
+    try {
+        const { conversationId } = req.params;
+        const { intent } = req.body;
+        
+        console.log(`Updating intent for conversation ${conversationId} to:`, intent);
+        
+        const updatedCall = await garudaSentryCalls.updateIntent(conversationId, intent);
+        console.log('Updated call intent:', updatedCall);
+        
+        res.json(updatedCall);
+        
+    } catch (error) {
+        console.error('Error updating call intent:', error);
+        res.status(500).json({ 
+            error: 'Failed to update call intent',
+            details: error.message
+        });
+    }
+});
+
+// Update caller phone endpoint
+app.put("/api/calls/:conversationId/phone", async (req, res) => {
+    try {
+        const { conversationId } = req.params;
+        const { caller_phone } = req.body;
+        
+        console.log(`Updating caller phone for conversation ${conversationId} to:`, caller_phone);
+        
+        const updatedCall = await garudaSentryCalls.updateCallerPhone(conversationId, caller_phone);
+        console.log('Updated caller phone:', updatedCall);
+        
+        res.json(updatedCall);
+        
+    } catch (error) {
+        console.error('Error updating caller phone:', error);
+        res.status(500).json({ 
+            error: 'Failed to update caller phone',
+            details: error.message
+        });
+    }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`PCR Backend server running on http://localhost:${PORT}`);

@@ -1,5 +1,5 @@
 import { Conversation } from '@elevenlabs/client';
-import { supabase, garudaSentryCalls } from './supabase.js';
+import { supabase } from './supabase.js';
 
 const startButton = document.getElementById('startButton');
 const stopButton = document.getElementById('stopButton');
@@ -75,7 +75,19 @@ async function createCallRecord() {
             caller_phone: null // Will be updated if phone number is detected
         };
         
-        currentCallRecord = await garudaSentryCalls.create(callData);
+        const response = await fetch('http://localhost:3001/api/calls/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(callData)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to create call record: ${response.statusText}`);
+        }
+        
+        currentCallRecord = await response.json();
         console.log('PCR CAD Voice AI: Call record created:', currentCallRecord);
     } catch (error) {
         console.error('PCR CAD Voice AI: Failed to create call record:', error);
@@ -99,7 +111,18 @@ async function stopConversation() {
 async function updateCallIntent(intent) {
     if (currentCallRecord) {
         try {
-            await garudaSentryCalls.updateIntent(currentCallRecord.conversation_id, intent);
+            const response = await fetch(`http://localhost:3001/api/calls/${currentCallRecord.conversation_id}/intent`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ intent })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to update call intent: ${response.statusText}`);
+            }
+            
             console.log('PCR CAD Voice AI: Call intent updated to:', intent);
         } catch (error) {
             console.error('PCR CAD Voice AI: Failed to update call intent:', error);
@@ -111,7 +134,18 @@ async function updateCallIntent(intent) {
 async function updateCallerPhone(phoneNumber) {
     if (currentCallRecord) {
         try {
-            await garudaSentryCalls.updateCallerPhone(currentCallRecord.conversation_id, phoneNumber);
+            const response = await fetch(`http://localhost:3001/api/calls/${currentCallRecord.conversation_id}/phone`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ caller_phone: phoneNumber })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to update caller phone: ${response.statusText}`);
+            }
+            
             console.log('PCR CAD Voice AI: Caller phone updated to:', phoneNumber);
         } catch (error) {
             console.error('PCR CAD Voice AI: Failed to update caller phone:', error);
@@ -130,4 +164,3 @@ console.log('PCR CAD Voice AI: Supabase connected to:', import.meta.env.VITE_SUP
 // Make functions available globally for debugging/testing
 window.updateCallIntent = updateCallIntent;
 window.updateCallerPhone = updateCallerPhone;
-window.garudaSentryCalls = garudaSentryCalls;
