@@ -1,10 +1,15 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
+import { config } from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import callsRouter from './routes/calls.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 // Load environment variables
-dotenv.config();
+config({ path: join(__dirname, '.env') });
 
 const app = express();
 const PORT = process.env.PORT || 3001;
