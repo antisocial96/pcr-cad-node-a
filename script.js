@@ -16,7 +16,7 @@ async function startConversation() {
 
         // Start the conversation
         conversation = await Conversation.startSession({
-            agentId: import.meta.env.VITE_ELEVENLABS_AGENT_ID,
+            agentId: import.meta.env.ELEVENLABS_AGENT_ID,
             onConnect: () => {
                 // Create a call record when conversation starts
                 createCallRecord();
