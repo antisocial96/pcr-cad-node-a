@@ -150,7 +150,8 @@ app.post("/api/webhook/elevenlabs/post-call", async (req, res) => {
                 const newCallData = {
                     conversation_id: conversationId,
                    intent: webhookData.analysis?.data_collection_results?.intent || 'unknown',
-                    caller_phone: webhookData.caller_phone || webhookData.phone_number || null
+                    caller_phone: webhookData.caller_phone || webhookData.phone_number || null,
+                    timestamp: webhookData.event_timestamp ? new Date(webhookData.event_timestamp).toISOString() : null
                 };
                 
                 const newCall = await garudaSentryCalls.create(newCallData);

@@ -126,6 +126,10 @@ export const garudaSentryCalls = {
       updateData.caller_phone = webhookData.caller_phone || webhookData.phone_number;
     }
 
+    // Extract timestamp from event_timestamp
+    if (webhookData.event_timestamp) {
+      updateData.timestamp = new Date(webhookData.event_timestamp).toISOString();
+    }
     const { data, error } = await supabase
       .from('garuda_sentry_calls')
       .update(updateData)
