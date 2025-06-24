@@ -1,15 +1,13 @@
 import express from 'express';
-import { emergencyCallsDB } from '../lib/supabase.js';
+import { garudaSentryCallsDB } from '../lib/supabase.js';
 
 const router = express.Router();
 
-// GET /api/calls - Get all emergency calls
+// GET /api/calls - Get all garuda sentry calls
 router.get('/', async (req, res) => {
   try {
     const filters = {
-      status: req.query.status,
-      intent: req.query.intent,
-      priority_level: req.query.priority_level ? parseInt(req.query.priority_level) : undefined
+      intent: req.query.intent
     };
 
     // Remove undefined values
@@ -17,7 +15,7 @@ router.get('/', async (req, res) => {
       filters[key] === undefined && delete filters[key]
     );
 
-    const calls = await emergencyCallsDB.getAll(filters);
+    const calls = await garudaSentryCallsDB.getAll(filters);
     res.json({ success: true, data: calls });
   } catch (error) {
     console.error('Error fetching calls:', error);
@@ -25,21 +23,10 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/calls/priority - Get calls sorted by priority
-router.get('/priority', async (req, res) => {
-  try {
-    const calls = await emergencyCallsDB.getByPriority();
-    res.json({ success: true, data: calls });
-  } catch (error) {
-    console.error('Error fetching calls by priority:', error);
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
 // GET /api/calls/:conversationId - Get specific call by conversation ID
 router.get('/:conversationId', async (req, res) => {
   try {
-    const call = await emergencyCallsDB.getByConversationId(req.params.conversationId);
+    const call = await garudaSentryCallsDB.getByConversationId(req.params.conversationId);
     
     if (!call) {
       return res.status(404).json({ success: false, error: 'Call not found' });
@@ -56,7 +43,7 @@ router.get('/:conversationId', async (req, res) => {
 router.put('/:conversationId', async (req, res) => {
   try {
     const updates = req.body;
-    const call = await emergencyCallsDB.update(req.params.conversationId, updates);
+    const call = await garudaSentryCallsDB.update(req.params.conversationId, updates);
     res.json({ success: true, data: call });
   } catch (error) {
     console.error('Error updating call:', error);
