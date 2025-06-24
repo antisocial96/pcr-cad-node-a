@@ -106,6 +106,12 @@ app.post("/api/webhook/elevenlabs/post-call", async (req, res) => {
             return res.status(401).json({ error: error });
         }
 
+        // Store and log the entire JSON payload for debugging
+        const completePayload = event;
+        console.log('=== COMPLETE WEBHOOK PAYLOAD ===');
+        console.log(JSON.stringify(completePayload, null, 2));
+        console.log('=== END PAYLOAD ===');
+
         console.log('Verified ElevenLabs post-call webhook:', JSON.stringify(event, null, 2));
         
         // Handle post_call_transcription event
