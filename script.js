@@ -66,20 +66,14 @@ async function startConversation() {
 
 async function createCallRecord() {
     try {
-        console.log('📞 PCR CAD Voice AI: Creating call record...');
-        
         // Generate a unique conversation ID
         const conversationId = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        console.log('🆔 PCR CAD Voice AI: Generated conversation ID:', conversationId);
         
         const callData = {
             conversation_id: conversationId,
             intent: 'unknown',
             caller_phone: null // Will be updated if phone number is detected
         };
-        
-        console.log('📦 PCR CAD Voice AI: Call data to create:', JSON.stringify(callData, null, 2));
-        console.log('🔄 PCR CAD Voice AI: Sending create request to backend...');
         
         const response = await fetch('http://localhost:3001/api/calls/create', {
             method: 'POST',
@@ -90,17 +84,13 @@ async function createCallRecord() {
         });
         
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error('❌ PCR CAD Voice AI: Backend responded with error:', response.status, errorText);
             throw new Error(`Failed to create call record: ${response.statusText}`);
         }
         
         currentCallRecord = await response.json();
-        console.log('✅ PCR CAD Voice AI: Call record created successfully');
-        console.log('📋 PCR CAD Voice AI: Created record:', JSON.stringify(currentCallRecord, null, 2));
+        console.log('PCR CAD Voice AI: Call record created:', currentCallRecord);
     } catch (error) {
-        console.error('💥 PCR CAD Voice AI: FAILED to create call record');
-        console.error('❌ PCR CAD Voice AI: Error details:', error);
+        console.error('PCR CAD Voice AI: Failed to create call record:', error);
     }
 }
 
@@ -119,14 +109,8 @@ async function stopConversation() {
 
 // Function to update call intent (can be called when intent is detected)
 async function updateCallIntent(intent) {
-    console.log('🎯 PCR CAD Voice AI: Updating call intent...');
-    console.log('🎯 PCR CAD Voice AI: New intent:', intent);
-    
     if (currentCallRecord) {
         try {
-            console.log('🆔 PCR CAD Voice AI: Conversation ID:', currentCallRecord.conversation_id);
-            console.log('🔄 PCR CAD Voice AI: Sending intent update request to backend...');
-            
             const response = await fetch(`http://localhost:3001/api/calls/${currentCallRecord.conversation_id}/intent`, {
                 method: 'PUT',
                 headers: {
@@ -136,33 +120,20 @@ async function updateCallIntent(intent) {
             });
             
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ PCR CAD Voice AI: Backend responded with error:', response.status, errorText);
                 throw new Error(`Failed to update call intent: ${response.statusText}`);
             }
             
-            const updatedRecord = await response.json();
-            console.log('✅ PCR CAD Voice AI: Call intent updated successfully');
-            console.log('📋 PCR CAD Voice AI: Updated record:', JSON.stringify(updatedRecord, null, 2));
+            console.log('PCR CAD Voice AI: Call intent updated to:', intent);
         } catch (error) {
-            console.error('💥 PCR CAD Voice AI: FAILED to update call intent');
-            console.error('❌ PCR CAD Voice AI: Error details:', error);
+            console.error('PCR CAD Voice AI: Failed to update call intent:', error);
         }
-    } else {
-        console.warn('⚠️  PCR CAD Voice AI: No current call record to update intent for');
     }
 }
 
 // Function to update caller phone (can be called when phone number is detected)
 async function updateCallerPhone(phoneNumber) {
-    console.log('📞 PCR CAD Voice AI: Updating caller phone...');
-    console.log('📞 PCR CAD Voice AI: New phone number:', phoneNumber);
-    
     if (currentCallRecord) {
         try {
-            console.log('🆔 PCR CAD Voice AI: Conversation ID:', currentCallRecord.conversation_id);
-            console.log('🔄 PCR CAD Voice AI: Sending phone update request to backend...');
-            
             const response = await fetch(`http://localhost:3001/api/calls/${currentCallRecord.conversation_id}/phone`, {
                 method: 'PUT',
                 headers: {
@@ -172,20 +143,13 @@ async function updateCallerPhone(phoneNumber) {
             });
             
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ PCR CAD Voice AI: Backend responded with error:', response.status, errorText);
                 throw new Error(`Failed to update caller phone: ${response.statusText}`);
             }
             
-            const updatedRecord = await response.json();
-            console.log('✅ PCR CAD Voice AI: Caller phone updated successfully');
-            console.log('📋 PCR CAD Voice AI: Updated record:', JSON.stringify(updatedRecord, null, 2));
+            console.log('PCR CAD Voice AI: Caller phone updated to:', phoneNumber);
         } catch (error) {
-            console.error('💥 PCR CAD Voice AI: FAILED to update caller phone');
-            console.error('❌ PCR CAD Voice AI: Error details:', error);
+            console.error('PCR CAD Voice AI: Failed to update caller phone:', error);
         }
-    } else {
-        console.warn('⚠️  PCR CAD Voice AI: No current call record to update phone for');
     }
 }
 
