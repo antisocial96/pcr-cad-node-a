@@ -19,6 +19,23 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'PCR Backend is running' });
 });
 
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'PCR Backend API Server',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      signedUrl: '/api/get-signed-url',
+      webhook: '/api/webhook/elevenlabs/post-call',
+      createCall: '/api/calls/create',
+      updateIntent: '/api/calls/:conversationId/intent',
+      updatePhone: '/api/calls/:conversationId/phone'
+    }
+  });
+});
+
 // ElevenLabs signed URL endpoint
 app.get("/api/get-signed-url", async (req, res) => {
     try {
