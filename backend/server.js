@@ -98,7 +98,7 @@ app.get("/api/webhook/elevenlabs/post-call", (req, res) => {
 
 app.post("/api/webhook/elevenlabs/post-call", async (req, res) => {
     try {
-        const secret = process.env.ELEVENLABS_CONVAI_WEBHOOK_SECRET;
+        const secret = process.env.ELEVENLABS_WEBHOOK_SECRET;
         const { event, error } = await constructWebhookEvent(req, secret);
         
         if (error) {
@@ -247,5 +247,5 @@ app.put("/api/calls/:conversationId/phone", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`PCR Backend server running on http://localhost:${PORT}`);
   console.log(`Webhook endpoint available at: http://localhost:${PORT}/api/webhook/elevenlabs/post-call`);
-  console.log(`Webhook secret configured: ${process.env.ELEVENLABS_CONVAI_WEBHOOK_SECRET ? 'Yes' : 'No'}`);
+  console.log(`Webhook secret configured: ${process.env.ELEVENLABS_WEBHOOK_SECRET ? 'Yes' : 'No'}`);
 });
