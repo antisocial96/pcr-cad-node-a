@@ -116,9 +116,9 @@ export const garudaSentryCalls = {
     // Extract intent from data.analysis.data_collection_results.intent
     if (webhookData.analysis?.data_collection_results?.intent) {
       updateData.intent = webhookData.analysis.data_collection_results.intent;
-    } else if (webhookData.status) {
-      // Fallback to status if intent not found in expected path
-      updateData.intent = webhookData.status;
+    } else {
+      // Fallback to 'unknown' if intent not found in expected path
+      updateData.intent = 'unknown';
     }
 
     // Extract caller phone if available in webhook data

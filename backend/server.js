@@ -149,7 +149,7 @@ app.post("/api/webhook/elevenlabs/post-call", async (req, res) => {
                 
                 const newCallData = {
                     conversation_id: conversationId,
-                   intent: webhookData.analysis?.data_collection_results?.intent || webhookData.status || 'webhook_received',
+                   intent: webhookData.analysis?.data_collection_results?.intent || 'unknown',
                     caller_phone: webhookData.caller_phone || webhookData.phone_number || null
                 };
                 
