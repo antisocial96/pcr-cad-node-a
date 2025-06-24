@@ -114,7 +114,7 @@ app.post("/api/webhook/elevenlabs/post-call", async (req, res) => {
             
             const webhookData = event.data;
             
-            // Extract conversation_id from webhook payload
+            // Extract conversation_id from data.conversation_id
             const conversationId = webhookData.conversation_id;
             
             if (!conversationId) {
