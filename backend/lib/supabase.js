@@ -6,17 +6,12 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load environment variables from root directory
-config({ path: join(__dirname, '../../.env') });
+// Load environment variables from root directory (.env file)
+const envPath = join(__dirname, '../../.env');
+config({ path: envPath });
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
-
-console.log('Environment check:', {
-  hasSupabaseUrl: !!supabaseUrl,
-  hasSupabaseKey: !!supabaseKey,
-  nodeEnv: process.env.NODE_ENV
-});
 
 if (!supabaseUrl || !supabaseKey) {
   console.error('Missing Supabase environment variables:');

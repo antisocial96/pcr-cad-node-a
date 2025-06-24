@@ -8,8 +8,18 @@ import callsRouter from './routes/calls.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load environment variables from root directory
-config({ path: join(__dirname, '../.env') });
+// Load environment variables from root directory (.env file)
+const envPath = join(__dirname, '../.env');
+config({ path: envPath });
+
+// Debug environment loading
+console.log('Loading environment from:', envPath);
+console.log('Environment variables loaded:', {
+  PORT: process.env.PORT || 'not set',
+  SUPABASE_URL: process.env.SUPABASE_URL ? 'loaded' : 'missing',
+  SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ? 'loaded' : 'missing',
+  NODE_ENV: process.env.NODE_ENV || 'not set'
+});
 
 const app = express();
 const PORT = process.env.PORT || 3001;
