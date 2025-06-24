@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import callsRouter from './routes/calls.js';
+import webhooksRouter from './routes/webhooks.js';
 
 // Load environment variables
 dotenv.config();
@@ -15,6 +16,7 @@ app.use(express.json());
 
 // API Routes
 app.use('/api/calls', callsRouter);
+app.use('/api/webhooks', webhooksRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
