@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
-    "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev || echo 'Frontend directory not found or npm dev script missing'",
+    "dev:backend": "cd backend && npm run dev || echo 'Backend directory not found or npm dev script missing'",
     "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
   },
   "keywords": ["emergency", "call-center", "elevenlabs", "voice-ai"],
