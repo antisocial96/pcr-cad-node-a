@@ -128,10 +128,12 @@ app.post("/api/webhook/elevenlabs/post-call", async (req, res) => {
                 return res.status(400).json({ error: 'Missing conversation_id in webhook payload' });
             }
             
+            console.log('Processing webhook for conversation ID:', conversationId);
+            
             // Check if the call record exists
             try {
                 const existingCall = await garudaSentryCalls.getByConversationId(conversationId);
-                console.log('Found existing call record:', existingCall.id);
+                console.log('Found existing call record for conversation:', conversationId);
                 
                 // Update the call record with webhook data
                 const updatedCall = await garudaSentryCalls.updateFromWebhook(conversationId, webhookData);
@@ -150,23 +152,23 @@ app.post("/api/webhook/elevenlabs/post-call", async (req, res) => {
                 });
                 
             } catch (fetchError) {
-                // If call record doesn't exist, create a new one
-                console.log('Call record not found, creating new record for conversation:', conversationId);
+                // If call record doesn't exist, create a new one with the real conversation ID
+                console.log('Call record not found, creating new record for ElevenLabs conversation:', conversationId);
                 
                 const newCallData = {
                     conversation_id: conversationId,
-                   intent: webhookData.analysis?.data_collection_results?.intent || 'unknown',
+                    intent: webhookData.analysis?.data_collection_results?.intent || 'unknown',
                     caller_phone: webhookData.caller_phone || webhookData.phone_number || null,
                     timestamp: webhookData.event_timestamp ? new Date(webhookData.event_timestamp).toISOString() : null
                 };
                 
                 const newCall = await garudaSentryCalls.create(newCallData);
-                console.log('Created new call record from webhook:', newCall);
+                console.log('Created new call record from webhook with real conversation ID:', newCall);
                 
                 return res.status(200).json({ 
                     received: true,
                     success: true, 
-                    message: 'New call record created from webhook',
+                    message: 'New call record created from webhook with real conversation ID',
                     created_call: newCall
                 });
             }

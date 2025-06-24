@@ -7,7 +7,7 @@ const connectionStatus = document.getElementById('connectionStatus');
 const agentStatus = document.getElementById('agentStatus');
 
 let conversation;
-let currentCallRecord = null;
+let conversationId = null;
 
 async function getSignedUrl() {
     const response = await fetch('http://localhost:3001/api/get-signed-url');
@@ -29,19 +29,26 @@ async function startConversation() {
         conversation = await Conversation.startSession({
             signedUrl,
             onConnect: () => {
-                // Create a call record when conversation starts
-                createCallRecord();
                 connectionStatus.textContent = 'Connected';
                 connectionStatus.style.color = '#10b981';
                 startButton.disabled = true;
                 stopButton.disabled = false;
                 console.log('PCR CAD Voice AI: Connected to conversation');
+                
+                // Get the actual conversation ID from ElevenLabs
+                if (conversation && conversation.conversationId) {
+                    conversationId = conversation.conversationId;
+                    console.log('PCR CAD Voice AI: Using ElevenLabs conversation ID:', conversationId);
+                } else {
+                    console.log('PCR CAD Voice AI: Waiting for conversation ID from webhook...');
+                }
             },
             onDisconnect: () => {
                 connectionStatus.textContent = 'Disconnected';
                 connectionStatus.style.color = '#ef4444';
                 startButton.disabled = false;
                 stopButton.disabled = true;
+                conversationId = null;
                 console.log('PCR CAD Voice AI: Disconnected from conversation');
             },
             onError: (error) => {
@@ -64,42 +71,12 @@ async function startConversation() {
     }
 }
 
-async function createCallRecord() {
-    try {
-        // Generate a unique conversation ID
-        const conversationId = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        
-        const callData = {
-            conversation_id: conversationId,
-            intent: 'unknown',
-            caller_phone: null // Will be updated if phone number is detected
-        };
-        
-        const response = await fetch('http://localhost:3001/api/calls/create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(callData)
-        });
-        
-        if (!response.ok) {
-            throw new Error(`Failed to create call record: ${response.statusText}`);
-        }
-        
-        currentCallRecord = await response.json();
-        console.log('PCR CAD Voice AI: Call record created:', currentCallRecord);
-    } catch (error) {
-        console.error('PCR CAD Voice AI: Failed to create call record:', error);
-    }
-}
-
 async function stopConversation() {
     if (conversation) {
         try {
             await conversation.endSession();
             conversation = null;
-            currentCallRecord = null;
+            conversationId = null;
             console.log('PCR CAD Voice AI: Conversation ended');
         } catch (error) {
             console.error('PCR CAD Voice AI: Error ending conversation:', error);
@@ -109,9 +86,9 @@ async function stopConversation() {
 
 // Function to update call intent (can be called when intent is detected)
 async function updateCallIntent(intent) {
-    if (currentCallRecord) {
+    if (conversationId) {
         try {
-            const response = await fetch(`http://localhost:3001/api/calls/${currentCallRecord.conversation_id}/intent`, {
+            const response = await fetch(`http://localhost:3001/api/calls/${conversationId}/intent`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -132,9 +109,9 @@ async function updateCallIntent(intent) {
 
 // Function to update caller phone (can be called when phone number is detected)
 async function updateCallerPhone(phoneNumber) {
-    if (currentCallRecord) {
+    if (conversationId) {
         try {
-            const response = await fetch(`http://localhost:3001/api/calls/${currentCallRecord.conversation_id}/phone`, {
+            const response = await fetch(`http://localhost:3001/api/calls/${conversationId}/phone`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
