@@ -5,7 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>ElevenLabs Conversational AI</title>
     </head>
-    <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+    <body style="margin: 0; padding: 0; min-height: 100vh; background-color: #f5f5f5; display: flex; align-items: center; justify-content: center;">
+        <div style="font-family: Arial, sans-serif; text-align: center; padding: 50px; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); max-width: 500px; width: 90%;">
         <h1>ElevenLabs Conversational AI</h1>
         <div style="margin-bottom: 20px;">
             <button id="startButton" style="padding: 10px 20px; margin: 5px;">Start Conversation</button>
@@ -14,6 +15,7 @@
         <div style="font-size: 18px;">
             <p>Status: <span id="connectionStatus">Disconnected</span></p>
             <p>Agent is <span id="agentStatus">listening</span></p>
+        </div>
         </div>
         <script type="module" src="./script.js"></script>
     </body>
