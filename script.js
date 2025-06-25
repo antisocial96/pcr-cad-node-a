@@ -172,7 +172,10 @@ function displayCalls(calls) {
         return;
     }
     
-    const callsHtml = calls.map(call => {
+    // Show only the most recent 2 records
+    const recentCalls = calls.slice(0, 2);
+    
+    const callsHtml = recentCalls.map(call => {
         const intent = call.intent || 'unknown';
         const callIdLast4 = call.conversation_id ? call.conversation_id.slice(-4) : 'N/A';
         
@@ -196,7 +199,13 @@ function displayCalls(calls) {
         `;
     }).join('');
     
-    callsContainer.innerHTML = callsHtml;
+    // Add a note if there are more records than displayed
+    const totalRecordsNote = calls.length > 2 ? 
+        `<p style="text-align: center; color: #666; font-size: 12px; margin-top: 10px;">
+            Showing 2 most recent calls (${calls.length} total)
+        </p>` : '';
+    
+    callsContainer.innerHTML = callsHtml + totalRecordsNote;
 }
 
 // Event listeners
