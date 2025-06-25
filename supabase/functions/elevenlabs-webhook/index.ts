@@ -111,14 +111,14 @@ Deno.serve(async (req)=>{
   });
   if (event?.type === "post_call_transcription") {
     const data = event.data;
-    const conversationId = data.conversation_id;
+    const conversationId = data.conversation_id || 'fake_id';
     if (!conversationId) return new Response(JSON.stringify({
       error: "Missing conversation_id"
     }), {
       status: 400,
       headers: corsHeaders
     });
-    const intent = data.analysis?.data_collection_results?.intent || 'unknown';
+    const intent = data.analysis.data_collection_results.intent || 'not available';
     const caller_phone = data.caller_phone || data.phone_number || null;
     const timestamp = data.event_timestamp ? new Date(data.event_timestamp).toISOString() : null;
     try {
