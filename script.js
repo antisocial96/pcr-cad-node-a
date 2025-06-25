@@ -178,6 +178,9 @@ function displayCalls(calls) {
         const phone = call.caller_phone || 'N/A';
         const conversationId = call.conversation_id || 'N/A';
         
+        // Get last 4 digits of conversation ID
+        const displayId = conversationId !== 'N/A' ? conversationId.slice(-4) : 'N/A';
+        
         // Color code intents
         let intentColor = '#666';
         if (intent === 'emergency') intentColor = '#ef4444';
@@ -189,7 +192,7 @@ function displayCalls(calls) {
         return `
             <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 10px; background: #f9fafb;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <strong style="color: #374151;">Call ID: ${conversationId.substring(0, 8)}...</strong>
+                    <strong style="color: #374151;">Call ID: ${displayId}</strong>
                     <span style="background: ${intentColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">
                         ${intent.toUpperCase()}
                     </span>
@@ -197,7 +200,6 @@ function displayCalls(calls) {
                 <div style="font-size: 14px; color: #6b7280;">
                     <p style="margin: 5px 0;"><strong>Phone:</strong> ${phone}</p>
                     <p style="margin: 5px 0;"><strong>Time:</strong> ${timestamp}</p>
-                    <p style="margin: 5px 0;"><strong>Conversation ID:</strong> ${conversationId}</p>
                 </div>
             </div>
         `;
