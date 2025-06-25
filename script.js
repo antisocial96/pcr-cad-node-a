@@ -9,7 +9,15 @@ let conversation;
 let conversationId = null;
 
 async function getSignedUrl() {
-    const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/get-signed-url');
+    const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/get-signed-url', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        }
+    });
     if (!response.ok) {
         throw new Error(`Failed to get signed url: ${response.statusText}`);
     }
@@ -91,6 +99,9 @@ async function updateCallIntent(intent) {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
                 },
                 body: JSON.stringify({ 
                     conversation_id: conversationId,
@@ -118,6 +129,9 @@ async function updateCallerPhone(phoneNumber) {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
                 },
                 body: JSON.stringify({ 
                     conversation_id: conversationId,
@@ -144,6 +158,9 @@ async function createCallRecord(callData) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization'
             },
             body: JSON.stringify(callData)
         });
