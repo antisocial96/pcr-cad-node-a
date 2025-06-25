@@ -5,12 +5,10 @@
   "main": "backend/server.js",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"vite\" \"node backend/server.js\"",
-    "dev:backend": "node backend/server.js",
+    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node backend/server.js",
-    "test:backend": "node backend/test-server.js"
+    "start": "vite preview"
   },
   "keywords": ["emergency", "call-center", "elevenlabs", "voice-ai"],
   "author": "",

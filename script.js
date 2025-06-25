@@ -11,7 +11,7 @@ let conversation;
 let conversationId = null;
 
 async function getSignedUrl() {
-    const response = await fetch('http://localhost:3001/api/get-signed-url');
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-signed-url`);
     if (!response.ok) {
         throw new Error(`Failed to get signed url: ${response.statusText}`);
     }
@@ -94,16 +94,14 @@ async function stopConversation() {
 async function updateCallIntent(intent) {
     if (conversationId) {
         try {
-            const response = await fetch(`http://localhost:3001/api/calls/${conversationId}/intent`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ intent })
-            });
+            const { data, error } = await supabase
+                .from('garuda_sentry_calls')
+                .update({ intent })
+                .eq('conversation_id', conversationId)
+                .select();
             
-            if (!response.ok) {
-                throw new Error(`Failed to update call intent: ${response.statusText}`);
+            if (error) {
+                throw error;
             }
             
             console.log('PCR CAD Voice AI: Call intent updated to:', intent);
@@ -117,16 +115,14 @@ async function updateCallIntent(intent) {
 async function updateCallerPhone(phoneNumber) {
     if (conversationId) {
         try {
-            const response = await fetch(`http://localhost:3001/api/calls/${conversationId}/phone`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ caller_phone: phoneNumber })
-            });
+            const { data, error } = await supabase
+                .from('garuda_sentry_calls')
+                .update({ caller_phone: phoneNumber })
+                .eq('conversation_id', conversationId)
+                .select();
             
-            if (!response.ok) {
-                throw new Error(`Failed to update caller phone: ${response.statusText}`);
+            if (error) {
+                throw error;
             }
             
             console.log('PCR CAD Voice AI: Caller phone updated to:', phoneNumber);
@@ -140,13 +136,15 @@ async function updateCallerPhone(phoneNumber) {
 async function fetchAndDisplayCalls() {
     try {
         console.log('PCR CAD Voice AI: Fetching call records...');
-        const response = await fetch('http://localhost:3001/api/calls');
+        const { data: calls, error } = await supabase
+            .from('garuda_sentry_calls')
+            .select('*')
+            .order('timestamp', { ascending: false });
         
-        if (!response.ok) {
-            throw new Error(`Failed to fetch calls: ${response.statusText}`);
+        if (error) {
+            throw error;
         }
         
-        const calls = await response.json();
         console.log('PCR CAD Voice AI: Retrieved call records:', calls);
         
         displayCalls(calls);
