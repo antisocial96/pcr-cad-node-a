@@ -5,6 +5,8 @@ const startButton = document.getElementById('startButton');
 const stopButton = document.getElementById('stopButton');
 const connectionStatus = document.getElementById('connectionStatus');
 const agentStatus = document.getElementById('agentStatus');
+const refreshCallsButton = document.getElementById('refreshCallsButton');
+const callsContainer = document.getElementById('callsContainer');
 
 let conversation;
 let conversationId = null;
@@ -130,14 +132,90 @@ async function updateCallerPhone(phoneNumber) {
     }
 }
 
+// Function to fetch and display all call records
+async function fetchAndDisplayCalls() {
+    try {
+        console.log('PCR CAD Voice AI: Fetching call records...');
+        const response = await fetch('http://localhost:3001/api/calls');
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch calls: ${response.statusText}`);
+        }
+        
+        const calls = await response.json();
+        console.log('PCR CAD Voice AI: Retrieved call records:', calls);
+        
+        displayCalls(calls);
+        
+    } catch (error) {
+        console.error('PCR CAD Voice AI: Failed to fetch call records:', error);
+        callsContainer.innerHTML = `
+            <p style="text-align: center; color: #ef4444;">
+                Failed to load call records: ${error.message}
+            </p>
+        `;
+    }
+}
+
+// Function to display call records in the UI
+function displayCalls(calls) {
+    if (!calls || calls.length === 0) {
+        callsContainer.innerHTML = `
+            <p style="text-align: center; color: #666;">
+                No call records found.
+            </p>
+        `;
+        return;
+    }
+    
+    const callsHtml = calls.map(call => {
+        const timestamp = call.timestamp ? new Date(call.timestamp).toLocaleString() : 'N/A';
+        const intent = call.intent || 'unknown';
+        const phone = call.caller_phone || 'N/A';
+        const conversationId = call.conversation_id || 'N/A';
+        
+        // Color code intents
+        let intentColor = '#666';
+        if (intent === 'emergency') intentColor = '#ef4444';
+        else if (intent === 'medical') intentColor = '#f59e0b';
+        else if (intent === 'fire') intentColor = '#dc2626';
+        else if (intent === 'police') intentColor = '#3b82f6';
+        else if (intent !== 'unknown') intentColor = '#10b981';
+        
+        return `
+            <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 10px; background: #f9fafb;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong style="color: #374151;">Call ID: ${conversationId.substring(0, 8)}...</strong>
+                    <span style="background: ${intentColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">
+                        ${intent.toUpperCase()}
+                    </span>
+                </div>
+                <div style="font-size: 14px; color: #6b7280;">
+                    <p style="margin: 5px 0;"><strong>Phone:</strong> ${phone}</p>
+                    <p style="margin: 5px 0;"><strong>Time:</strong> ${timestamp}</p>
+                    <p style="margin: 5px 0;"><strong>Conversation ID:</strong> ${conversationId}</p>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    callsContainer.innerHTML = callsHtml;
+}
+
 // Event listeners
 startButton.addEventListener('click', startConversation);
 stopButton.addEventListener('click', stopConversation);
+refreshCallsButton.addEventListener('click', fetchAndDisplayCalls);
 
 // Initialize the application
 console.log('PCR CAD Voice AI: Frontend initialized and ready');
 console.log('PCR CAD Voice AI: Supabase connected to:', import.meta.env.VITE_SUPABASE_URL);
 
+// Load call records on page load
+fetchAndDisplayCalls();
+
+// Auto-refresh call records every 30 seconds
+setInterval(fetchAndDisplayCalls, 30000);
+
 // Make functions available globally for debugging/testing
 window.updateCallIntent = updateCallIntent;
-window.updateCallerPhone = updateCallerPhone;

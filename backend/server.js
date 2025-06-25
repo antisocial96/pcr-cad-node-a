@@ -28,6 +28,8 @@ app.get('/', (req, res) => {
       health: '/health',
       signedUrl: '/api/get-signed-url',
       createCall: '/api/calls/create',
+      getAllCalls: '/api/calls',
+      getCall: '/api/calls/:conversationId',
       updateIntent: '/api/calls/:conversationId/intent',
       updatePhone: '/api/calls/:conversationId/phone'
     }
@@ -123,6 +125,45 @@ app.put("/api/calls/:conversationId/phone", async (req, res) => {
         console.error('Error updating caller phone:', error);
         res.status(500).json({ 
             error: 'Failed to update caller phone',
+            details: error.message
+        });
+    }
+});
+
+// Get all calls endpoint
+app.get("/api/calls", async (req, res) => {
+    try {
+        console.log('Fetching all call records');
+        
+        const calls = await garudaSentryCalls.getAll();
+        console.log(`Retrieved ${calls.length} call records`);
+        
+        res.json(calls);
+        
+    } catch (error) {
+        console.error('Error fetching call records:', error);
+        res.status(500).json({ 
+            error: 'Failed to fetch call records',
+            details: error.message
+        });
+    }
+});
+
+// Get call by conversation ID endpoint
+app.get("/api/calls/:conversationId", async (req, res) => {
+    try {
+        const { conversationId } = req.params;
+        console.log(`Fetching call record for conversation: ${conversationId}`);
+        
+        const call = await garudaSentryCalls.getByConversationId(conversationId);
+        console.log('Retrieved call record:', call);
+        
+        res.json(call);
+        
+    } catch (error) {
+        console.error('Error fetching call record:', error);
+        res.status(500).json({ 
+            error: 'Failed to fetch call record',
             details: error.message
         });
     }
