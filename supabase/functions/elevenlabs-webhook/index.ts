@@ -17,7 +17,7 @@
     - Updates or creates call records in database
 */
 
-import { createClient } from 'npm:@supabase/supabase-js@2.39.0';
+//import { createClient } from 'npm:@supabase/supabase-js@2.39.0';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
