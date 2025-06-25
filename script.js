@@ -1,5 +1,4 @@
 import { Conversation } from '@elevenlabs/client';
-import { supabase } from './supabase.js';
 
 const startButton = document.getElementById('startButton');
 const stopButton = document.getElementById('stopButton');
@@ -11,22 +10,24 @@ let conversation;
 let conversationId = null;
 
 async function getSignedUrl() {
-    const response = await fetch('http://localhost:3001/api/get-signed-url');
-    if (!response.ok) {
-        throw new Error(`Failed to get signed url: ${response.statusText}`);
+    try {
+        const response = await fetch('http://localhost:3001/api/get-signed-url');
+        if (!response.ok) {
+            throw new Error(`Failed to get signed url: ${response.statusText}`);
+        }
+        const { signedUrl } = await response.json();
+        return signedUrl;
+    } catch (error) {
+        console.error('Error getting signed URL:', error);
+        throw error;
     }
-    const { signedUrl } = await response.json();
-    return signedUrl;
 }
 
 async function startConversation() {
     try {
-        // Request microphone permission
         await navigator.mediaDevices.getUserMedia({ audio: true });
-
         const signedUrl = await getSignedUrl();
 
-        // Start the conversation
         conversation = await Conversation.startSession({
             signedUrl,
             onConnect: () => {
@@ -34,14 +35,10 @@ async function startConversation() {
                 connectionStatus.style.color = '#10b981';
                 startButton.disabled = true;
                 stopButton.disabled = false;
-                console.log('PCR CAD Voice AI: Connected to conversation');
                 
-                // Get the actual conversation ID from ElevenLabs
                 if (conversation && conversation.conversationId) {
                     conversationId = conversation.conversationId;
-                    console.log('PCR CAD Voice AI: Using ElevenLabs conversation ID:', conversationId);
-                } else {
-                    console.log('PCR CAD Voice AI: Waiting for conversation ID from webhook...');
+                    console.log('Connected with conversation ID:', conversationId);
                 }
             },
             onDisconnect: () => {
@@ -50,10 +47,9 @@ async function startConversation() {
                 startButton.disabled = false;
                 stopButton.disabled = true;
                 conversationId = null;
-                console.log('PCR CAD Voice AI: Disconnected from conversation');
             },
             onError: (error) => {
-                console.error('Error:', error);
+                console.error('Conversation error:', error);
                 connectionStatus.textContent = 'Error';
                 connectionStatus.style.color = '#ef4444';
                 startButton.disabled = false;
@@ -62,11 +58,10 @@ async function startConversation() {
             onModeChange: (mode) => {
                 agentStatus.textContent = mode.mode === 'speaking' ? 'speaking' : 'listening';
                 agentStatus.style.color = mode.mode === 'speaking' ? '#3b82f6' : '#10b981';
-                console.log('PCR CAD Voice AI: Mode changed to', mode.mode);
             },
         });
     } catch (error) {
-        console.error('PCR CAD Voice AI: Failed to start conversation:', error);
+        console.error('Failed to start conversation:', error);
         connectionStatus.textContent = 'Failed to connect';
         connectionStatus.style.color = '#ef4444';
     }
@@ -78,73 +73,23 @@ async function stopConversation() {
             await conversation.endSession();
             conversation = null;
             conversationId = null;
-            console.log('PCR CAD Voice AI: Conversation ended');
             
-            // Fetch and display call data after conversation ends
+            // Fetch updated data after conversation ends
             setTimeout(() => {
                 fetchAndDisplayCalls();
-            }, 100); // Wait 100ms for webhook processing
+            }, 100);
             
-            // Auto-refresh once more after 120ms to catch any delayed webhook data
             setTimeout(() => {
                 fetchAndDisplayCalls();
             }, 120);
         } catch (error) {
-            console.error('PCR CAD Voice AI: Error ending conversation:', error);
+            console.error('Error ending conversation:', error);
         }
     }
 }
 
-// Function to update call intent (can be called when intent is detected)
-async function updateCallIntent(intent) {
-    if (conversationId) {
-        try {
-            const response = await fetch(`http://localhost:3001/api/calls/${conversationId}/intent`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ intent })
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Failed to update call intent: ${response.statusText}`);
-            }
-            
-            console.log('PCR CAD Voice AI: Call intent updated to:', intent);
-        } catch (error) {
-            console.error('PCR CAD Voice AI: Failed to update call intent:', error);
-        }
-    }
-}
-
-// Function to update caller phone (can be called when phone number is detected)
-async function updateCallerPhone(phoneNumber) {
-    if (conversationId) {
-        try {
-            const response = await fetch(`http://localhost:3001/api/calls/${conversationId}/phone`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ caller_phone: phoneNumber })
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Failed to update caller phone: ${response.statusText}`);
-            }
-            
-            console.log('PCR CAD Voice AI: Caller phone updated to:', phoneNumber);
-        } catch (error) {
-            console.error('PCR CAD Voice AI: Failed to update caller phone:', error);
-        }
-    }
-}
-
-// Function to fetch and display all call records
 async function fetchAndDisplayCalls() {
     try {
-        console.log('PCR CAD Voice AI: Fetching call records...');
         const response = await fetch('http://localhost:3001/api/calls');
         
         if (!response.ok) {
@@ -152,12 +97,10 @@ async function fetchAndDisplayCalls() {
         }
         
         const calls = await response.json();
-        console.log('PCR CAD Voice AI: Retrieved call records:', calls);
-        
         displayCalls(calls);
         
     } catch (error) {
-        console.error('PCR CAD Voice AI: Failed to fetch call records:', error);
+        console.error('Failed to fetch call records:', error);
         callsContainer.innerHTML = `
             <p style="text-align: center; color: #ef4444;">
                 Failed to load call records: ${error.message}
@@ -166,7 +109,6 @@ async function fetchAndDisplayCalls() {
     }
 }
 
-// Function to display call records in the UI
 function displayCalls(calls) {
     if (!calls || calls.length === 0) {
         callsContainer.innerHTML = `
@@ -177,14 +119,12 @@ function displayCalls(calls) {
         return;
     }
     
-    // Show only the most recent 2 records
     const recentCalls = calls.slice(0, 2);
     
     const callsHtml = recentCalls.map(call => {
         const intent = call.intent || 'unknown';
         const callIdLast4 = call.conversation_id ? call.conversation_id.slice(-4) : 'N/A';
         
-        // Color code intents
         let intentColor = '#666';
         if (intent === 'emergency') intentColor = '#ef4444';
         else if (intent === 'medical') intentColor = '#f59e0b';
@@ -204,7 +144,6 @@ function displayCalls(calls) {
         `;
     }).join('');
     
-    // Add a note if there are more records than displayed
     const totalRecordsNote = calls.length > 2 ? 
         `<p style="text-align: center; color: #666; font-size: 12px; margin-top: 10px;">
             Showing 2 most recent calls (${calls.length} total)
@@ -213,16 +152,8 @@ function displayCalls(calls) {
     callsContainer.innerHTML = callsHtml + totalRecordsNote;
 }
 
-// Event listeners
 startButton.addEventListener('click', startConversation);
 stopButton.addEventListener('click', stopConversation);
 
-// Initialize the application
-console.log('PCR CAD Voice AI: Frontend initialized and ready');
-console.log('PCR CAD Voice AI: Supabase connected to:', import.meta.env.VITE_SUPABASE_URL);
-
-// Load call records on page load to show existing data
+// Load initial call records
 fetchAndDisplayCalls();
-
-// Make functions available globally for debugging/testing
-window.updateCallIntent = updateCallIntent;
