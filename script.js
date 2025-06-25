@@ -10,15 +10,12 @@ let conversation;
 let conversationId = null;
 
 async function getSignedUrl() {
-    const { data, error } = await supabase.functions.invoke('get-signed-url', {
-        body: {}
-    });
-    
-    if (error) {
-        throw new Error(`Failed to get signed url: ${error.message}`);
+    const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/get-signed-url');
+    if (!response.ok) {
+        throw new Error(`Failed to get signed url: ${response.statusText}`);
     }
-    
-    return data.signedUrl;
+    const { signedUrl } = await response.json();
+    return signedUrl;
 }
 
 async function startConversation() {
@@ -91,16 +88,12 @@ async function stopConversation() {
 async function updateCallIntent(intent) {
     if (conversationId) {
         try {
-            const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/calls-update', {
+            const response = await fetch(`http://localhost:3001/api/calls/${conversationId}/intent`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ 
-                    conversation_id: conversationId,
-                    intent,
-                    action: 'update_intent'
-                })
+                body: JSON.stringify({ intent })
             });
             
             if (!response.ok) {
@@ -118,16 +111,12 @@ async function updateCallIntent(intent) {
 async function updateCallerPhone(phoneNumber) {
     if (conversationId) {
         try {
-            const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/calls-update', {
+            const response = await fetch(`http://localhost:3001/api/calls/${conversationId}/phone`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ 
-                    conversation_id: conversationId,
-                    caller_phone: phoneNumber,
-                    action: 'update_phone'
-                })
+                body: JSON.stringify({ caller_phone: phoneNumber })
             });
             
             if (!response.ok) {
@@ -141,38 +130,14 @@ async function updateCallerPhone(phoneNumber) {
     }
 }
 
-// Function to create a new call record (can be called when conversation starts)
-async function createCallRecord(callData) {
-    try {
-        const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/create_call', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(callData)
-        });
-        
-        if (!response.ok) {
-            throw new Error(`Failed to create call record: ${response.statusText}`);
-        }
-        
-        const result = await response.json();
-        console.log('PCR CAD Voice AI: Call record created:', result);
-        return result;
-    } catch (error) {
-        console.error('PCR CAD Voice AI: Failed to create call record:', error);
-        throw error;
-    }
-}
-
 // Event listeners
 startButton.addEventListener('click', startConversation);
 stopButton.addEventListener('click', stopConversation);
 
 // Initialize the application
 console.log('PCR CAD Voice AI: Frontend initialized and ready');
+console.log('PCR CAD Voice AI: Supabase connected to:', import.meta.env.VITE_SUPABASE_URL);
 
 // Make functions available globally for debugging/testing
 window.updateCallIntent = updateCallIntent;
 window.updateCallerPhone = updateCallerPhone;
-window.createCallRecord = createCallRecord;

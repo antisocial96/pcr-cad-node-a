@@ -1,9 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
+import { config } from 'dotenv';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Load environment variables
+config();
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceRoleKey) {
+  throw new Error('Missing required Supabase environment variables: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY');
+}
+
+export const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
 // Database operations for garuda_sentry_calls table
 export const garudaSentryCalls = {
@@ -99,5 +107,40 @@ export const garudaSentryCalls = {
     }
     
     return data;
+  },
+
+  // Update call with webhook data
+  async updateFromWebhook(conversationId, webhookData) {
+    const updateData = {};
+    
+    // Extract intent from data.analysis.data_collection_results.intent
+    if (webhookData.analysis?.data_collection_results?.intent) {
+      updateData.intent = webhookData.analysis.data_collection_results.intent;
+    } else {
+      // Fallback to 'unknown' if intent not found in expected path
+      updateData.intent = 'unknown';
+    }
+
+    // Extract caller phone if available in webhook data
+    if (webhookData.caller_phone || webhookData.phone_number) {
+      updateData.caller_phone = webhookData.caller_phone || webhookData.phone_number;
+    }
+
+    // Extract timestamp from event_timestamp
+    if (webhookData.event_timestamp) {
+      updateData.timestamp = new Date(webhookData.event_timestamp).toISOString();
+    }
+    const { data, error } = await supabase
+      .from('garuda_sentry_calls')
+      .update(updateData)
+      .eq('conversation_id', conversationId)
+      .select();
+    
+    if (error) {
+      console.error('Error updating call from webhook:', error);
+      throw error;
+    }
+    
+    return data[0];
   }
 };
