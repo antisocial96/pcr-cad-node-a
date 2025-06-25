@@ -88,12 +88,15 @@ async function stopConversation() {
 async function updateCallIntent(intent) {
     if (conversationId) {
         try {
-            const response = await fetch(`http://localhost:3001/api/calls/${conversationId}/intent`, {
+            const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/update-call-intent', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ intent })
+                body: JSON.stringify({ 
+                    conversation_id: conversationId,
+                    intent 
+                })
             });
             
             if (!response.ok) {
@@ -111,12 +114,15 @@ async function updateCallIntent(intent) {
 async function updateCallerPhone(phoneNumber) {
     if (conversationId) {
         try {
-            const response = await fetch(`http://localhost:3001/api/calls/${conversationId}/phone`, {
+            const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/update-call-phone', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ caller_phone: phoneNumber })
+                body: JSON.stringify({ 
+                    conversation_id: conversationId,
+                    caller_phone: phoneNumber 
+                })
             });
             
             if (!response.ok) {
@@ -127,6 +133,30 @@ async function updateCallerPhone(phoneNumber) {
         } catch (error) {
             console.error('PCR CAD Voice AI: Failed to update caller phone:', error);
         }
+    }
+}
+
+// Function to create a new call record (can be called when conversation starts)
+async function createCallRecord(callData) {
+    try {
+        const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/create-call', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(callData)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to create call record: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('PCR CAD Voice AI: Call record created:', result);
+        return result;
+    } catch (error) {
+        console.error('PCR CAD Voice AI: Failed to create call record:', error);
+        throw error;
     }
 }
 
@@ -141,3 +171,4 @@ console.log('PCR CAD Voice AI: Supabase connected to:', import.meta.env.VITE_SUP
 // Make functions available globally for debugging/testing
 window.updateCallIntent = updateCallIntent;
 window.updateCallerPhone = updateCallerPhone;
+window.createCallRecord = createCallRecord;
