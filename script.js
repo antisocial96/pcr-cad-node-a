@@ -1,5 +1,4 @@
 import { Conversation } from '@elevenlabs/client';
-import { supabase } from './supabase.js';
 
 const startButton = document.getElementById('startButton');
 const stopButton = document.getElementById('stopButton');
@@ -10,17 +9,12 @@ let conversation;
 let conversationId = null;
 
 async function getSignedUrl() {
-    const { data, error } = await supabase.functions.invoke('get-signed-url', {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    });
-    
-    if (error) {
-        throw new Error(`Failed to get signed url: ${error.message}`);
+    const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/get-signed-url');
+    if (!response.ok) {
+        throw new Error(`Failed to get signed url: ${response.statusText}`);
     }
-    
-    return data.signedUrl;
+    const { signedUrl } = await response.json();
+    return signedUrl;
 }
 
 async function startConversation() {
@@ -93,19 +87,20 @@ async function stopConversation() {
 async function updateCallIntent(intent) {
     if (conversationId) {
         try {
-            const { data, error } = await supabase.functions.invoke('calls-update', {
-                body: { 
+            const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/calls-update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
                     conversation_id: conversationId,
                     intent,
                     action: 'update_intent'
-                },
-                headers: {
-                    'Content-Type': 'application/json',
-                }
+                })
             });
             
-            if (error) {
-                throw new Error(`Failed to update call intent: ${error.message}`);
+            if (!response.ok) {
+                throw new Error(`Failed to update call intent: ${response.statusText}`);
             }
             
             console.log('PCR CAD Voice AI: Call intent updated to:', intent);
@@ -119,19 +114,20 @@ async function updateCallIntent(intent) {
 async function updateCallerPhone(phoneNumber) {
     if (conversationId) {
         try {
-            const { data, error } = await supabase.functions.invoke('calls-update', {
-                body: { 
+            const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/calls-update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
                     conversation_id: conversationId,
                     caller_phone: phoneNumber,
                     action: 'update_phone'
-                },
-                headers: {
-                    'Content-Type': 'application/json',
-                }
+                })
             });
             
-            if (error) {
-                throw new Error(`Failed to update caller phone: ${error.message}`);
+            if (!response.ok) {
+                throw new Error(`Failed to update caller phone: ${response.statusText}`);
             }
             
             console.log('PCR CAD Voice AI: Caller phone updated to:', phoneNumber);
@@ -144,19 +140,21 @@ async function updateCallerPhone(phoneNumber) {
 // Function to create a new call record (can be called when conversation starts)
 async function createCallRecord(callData) {
     try {
-        const { data, error } = await supabase.functions.invoke('create_call', {
-            body: callData,
+        const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/create_call', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-            }
+            },
+            body: JSON.stringify(callData)
         });
         
-        if (error) {
-            throw new Error(`Failed to create call record: ${error.message}`);
+        if (!response.ok) {
+            throw new Error(`Failed to create call record: ${response.statusText}`);
         }
         
-        console.log('PCR CAD Voice AI: Call record created:', data);
-        return data;
+        const result = await response.json();
+        console.log('PCR CAD Voice AI: Call record created:', result);
+        return result;
     } catch (error) {
         console.error('PCR CAD Voice AI: Failed to create call record:', error);
         throw error;
