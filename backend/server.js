@@ -275,7 +275,7 @@ app.put("/api/calls/:conversationId/phone", async (req, res) => {
 });
 
 // Start server
-app.listen(PORT, '127.0.0.1', () => {
+app.listen(PORT, '::', () => {
   console.log(`PCR Backend server running on http://localhost:${PORT}`);
   console.log(`Server accessible on all interfaces at http://127.0.0.1:${PORT}`);
   console.log(`Webhook endpoint available at: http://localhost:${PORT}/api/webhook/elevenlabs/post-call`);
