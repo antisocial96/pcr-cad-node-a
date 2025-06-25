@@ -5,7 +5,6 @@ const startButton = document.getElementById('startButton');
 const stopButton = document.getElementById('stopButton');
 const connectionStatus = document.getElementById('connectionStatus');
 const agentStatus = document.getElementById('agentStatus');
-const refreshCallsButton = document.getElementById('refreshCallsButton');
 const callsContainer = document.getElementById('callsContainer');
 
 let conversation;
@@ -80,6 +79,11 @@ async function stopConversation() {
             conversation = null;
             conversationId = null;
             console.log('PCR CAD Voice AI: Conversation ended');
+            
+            // Fetch and display call data after conversation ends
+            setTimeout(() => {
+                fetchAndDisplayCalls();
+            }, 2000); // Wait 2 seconds for webhook processing
         } catch (error) {
             console.error('PCR CAD Voice AI: Error ending conversation:', error);
         }
@@ -205,17 +209,13 @@ function displayCalls(calls) {
 // Event listeners
 startButton.addEventListener('click', startConversation);
 stopButton.addEventListener('click', stopConversation);
-refreshCallsButton.addEventListener('click', fetchAndDisplayCalls);
 
 // Initialize the application
 console.log('PCR CAD Voice AI: Frontend initialized and ready');
 console.log('PCR CAD Voice AI: Supabase connected to:', import.meta.env.VITE_SUPABASE_URL);
 
-// Load call records on page load
+// Load call records on page load to show existing data
 fetchAndDisplayCalls();
-
-// Auto-refresh call records every 30 seconds
-setInterval(fetchAndDisplayCalls, 30000);
 
 // Make functions available globally for debugging/testing
 window.updateCallIntent = updateCallIntent;
