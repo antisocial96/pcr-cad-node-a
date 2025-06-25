@@ -23,6 +23,7 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization, elevenlabs-signature",
+  "Content-Type": "application/json",
 };
 
 // Helper function to construct and verify webhook event using Web Crypto API
