@@ -13,7 +13,8 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@elevenlabs/client": "0.1.7",
-    "@supabase/supabase-js": "^2.39.0"
+    "@supabase/supabase-js": "^2.39.0",
+    "cors": "^2.8.5"
   },
   "devDependencies": {
     "vite": "^5.4.2"
