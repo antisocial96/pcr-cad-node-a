@@ -5,7 +5,7 @@
   "main": "backend/server.js",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"vite\" \"npm run dev:backend\"",
+    "dev": "concurrently \"vite\" \"node backend/server.js\"",
     "dev:backend": "node backend/server.js",
     "build": "vite build",
     "preview": "vite preview",
