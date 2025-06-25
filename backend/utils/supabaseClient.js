@@ -109,38 +109,4 @@ export const garudaSentryCalls = {
     return data;
   },
 
-  // Update call with webhook data
-  async updateFromWebhook(conversationId, webhookData) {
-    const updateData = {};
-    
-    // Extract intent from data.analysis.data_collection_results.intent
-    if (webhookData.analysis?.data_collection_results?.intent) {
-      updateData.intent = webhookData.analysis.data_collection_results.intent;
-    } else {
-      // Fallback to 'unknown' if intent not found in expected path
-      updateData.intent = 'unknown';
-    }
-
-    // Extract caller phone if available in webhook data
-    if (webhookData.caller_phone || webhookData.phone_number) {
-      updateData.caller_phone = webhookData.caller_phone || webhookData.phone_number;
-    }
-
-    // Extract timestamp from event_timestamp
-    if (webhookData.event_timestamp) {
-      updateData.timestamp = new Date(webhookData.event_timestamp).toISOString();
-    }
-    const { data, error } = await supabase
-      .from('garuda_sentry_calls')
-      .update(updateData)
-      .eq('conversation_id', conversationId)
-      .select();
-    
-    if (error) {
-      console.error('Error updating call from webhook:', error);
-      throw error;
-    }
-    
-    return data[0];
-  }
 };
