@@ -173,10 +173,8 @@ function displayCalls(calls) {
     }
     
     const callsHtml = calls.map(call => {
-        const timestamp = call.timestamp ? new Date(call.timestamp).toLocaleString() : 'N/A';
         const intent = call.intent || 'unknown';
-        const phone = call.caller_phone || 'N/A';
-        const conversationId = call.conversation_id || 'N/A';
+        const callIdLast4 = call.conversation_id ? call.conversation_id.slice(-4) : 'N/A';
         
         // Color code intents
         let intentColor = '#666';
@@ -189,15 +187,10 @@ function displayCalls(calls) {
         return `
             <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 10px; background: #f9fafb;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <strong style="color: #374151;">Call ID: ${conversationId.substring(0, 8)}...</strong>
+                    <strong style="color: #374151;">Call ID: ...${callIdLast4}</strong>
                     <span style="background: ${intentColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">
                         ${intent.toUpperCase()}
                     </span>
-                </div>
-                <div style="font-size: 14px; color: #6b7280;">
-                    <p style="margin: 5px 0;"><strong>Phone:</strong> ${phone}</p>
-                    <p style="margin: 5px 0;"><strong>Time:</strong> ${timestamp}</p>
-                    <p style="margin: 5px 0;"><strong>Conversation ID:</strong> ${conversationId}</p>
                 </div>
             </div>
         `;
