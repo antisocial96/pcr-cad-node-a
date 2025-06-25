@@ -127,7 +127,7 @@ Deno.serve(async (req)=>{
     }
     const intent = data.analysis?.data_collection_results?.intent || "unknown";
     // const caller_phone = data.caller_phone || data.phone_number || null;
-    const timestamp = data.event_timestamp;
+    const timestamp = new Date(data.event_timestamp).toISOString();
     try {
       const { data: created, error: insertErr } = await supabase.from("garuda_sentry_calls").insert([
         {
