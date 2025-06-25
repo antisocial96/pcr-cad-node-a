@@ -84,6 +84,11 @@ async function stopConversation() {
             setTimeout(() => {
                 fetchAndDisplayCalls();
             }, 100); // Wait 100ms for webhook processing
+            
+            // Auto-refresh once more after 120ms to catch any delayed webhook data
+            setTimeout(() => {
+                fetchAndDisplayCalls();
+            }, 120);
         } catch (error) {
             console.error('PCR CAD Voice AI: Error ending conversation:', error);
         }
@@ -218,11 +223,6 @@ console.log('PCR CAD Voice AI: Supabase connected to:', import.meta.env.VITE_SUP
 
 // Load call records on page load to show existing data
 fetchAndDisplayCalls();
-
-// Auto-refresh call records every 120ms
-setInterval(() => {
-    fetchAndDisplayCalls();
-}, 120);
 
 // Make functions available globally for debugging/testing
 window.updateCallIntent = updateCallIntent;
