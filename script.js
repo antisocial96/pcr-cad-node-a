@@ -9,33 +9,12 @@ let conversation;
 let conversationId = null;
 
 async function getSignedUrl() {
-    try {
-        const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/get-signed-url');
-        
-        if (!response.ok) {
-            let errorMessage = `HTTP ${response.status}`;
-            try {
-                const errorData = await response.json();
-                errorMessage = errorData.error || errorData.details || errorMessage;
-            } catch (parseError) {
-                // If we can't parse the error response, use the status text
-                errorMessage = response.statusText || errorMessage;
-            }
-            throw new Error(`Failed to get signed URL: ${errorMessage}`);
-        }
-        
-        const data = await response.json();
-        if (!data.signedUrl) {
-            throw new Error('Invalid response: missing signed URL');
-        }
-        
-        return data.signedUrl;
-    } catch (error) {
-        if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            throw new Error('Failed to connect to Supabase Edge Function. Please check your network connection.');
-        }
-        throw error;
+    const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/get-signed-url');
+    if (!response.ok) {
+        throw new Error(`Failed to get signed url: ${response.statusText}`);
     }
+    const { signedUrl } = await response.json();
+    return signedUrl;
 }
 
 async function startConversation() {
