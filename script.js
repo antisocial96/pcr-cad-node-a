@@ -10,7 +10,7 @@ let conversation;
 let conversationId = null;
 
 async function getSignedUrl() {
-    const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/get-signed-url');
+    const response = await fetch('http://localhost:3001/api/get-signed-url');
     if (!response.ok) {
         throw new Error(`Failed to get signed url: ${response.statusText}`);
     }
