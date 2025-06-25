@@ -1,4 +1,5 @@
 import { Conversation } from '@elevenlabs/client';
+import { supabase } from './supabase.js';
 
 const startButton = document.getElementById('startButton');
 const stopButton = document.getElementById('stopButton');
@@ -9,17 +10,15 @@ let conversation;
 let conversationId = null;
 
 async function getSignedUrl() {
-    const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/get-signed-url', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+    const { data, error } = await supabase.functions.invoke('get-signed-url', {
+        body: {}
     });
-    if (!response.ok) {
-        throw new Error(`Failed to get signed url outside function: ${response.statusText}`);
+    
+    if (error) {
+        throw new Error(`Failed to get signed url: ${error.message}`);
     }
-    const { signedUrl } = await response.json();
-    return signedUrl;
+    
+    return data.signedUrl;
 }
 
 async function startConversation() {
