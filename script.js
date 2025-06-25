@@ -78,10 +78,6 @@ async function stopConversation() {
             setTimeout(() => {
                 fetchAndDisplayCalls();
             }, 100);
-            
-            setTimeout(() => {
-                fetchAndDisplayCalls();
-            }, 120);
         } catch (error) {
             console.error('Error ending conversation:', error);
         }
