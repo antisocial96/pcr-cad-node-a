@@ -1,5 +1,4 @@
 import { Conversation } from '@elevenlabs/client';
-import { supabase } from './supabase.js';
 
 const startButton = document.getElementById('startButton');
 const stopButton = document.getElementById('stopButton');
@@ -168,7 +167,6 @@ stopButton.addEventListener('click', stopConversation);
 
 // Initialize the application
 console.log('PCR CAD Voice AI: Frontend initialized and ready');
-console.log('PCR CAD Voice AI: Supabase connected to:', import.meta.env.VITE_SUPABASE_URL);
 
 // Make functions available globally for debugging/testing
 window.updateCallIntent = updateCallIntent;

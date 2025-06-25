@@ -2,28 +2,20 @@
   "name": "pcr-cad-node-a",
   "version": "1.0.0",
   "description": "Emergency assistance platform that enables each call operator to decide which call to assist next, communicate across languages, and initiate dispatch efficiently.",
-  "main": "backend/server.js",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"vite\" \"node backend/server.js\"",
-    "dev:backend": "node backend/server.js",
+    "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "start": "node backend/server.js",
-    "test:backend": "node backend/test-server.js"
+    "preview": "vite preview"
   },
   "keywords": ["emergency", "call-center", "elevenlabs", "voice-ai"],
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
     "@elevenlabs/client": "0.1.7",
-    "@supabase/supabase-js": "^2.39.0",
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "@supabase/supabase-js": "^2.39.0"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
     "vite": "^5.4.2"
   }
 }
