@@ -121,6 +121,36 @@ async function updateCallIntent(intent) {
     }
 }
 
+// Function to update caller phone (can be called when phone number is detected)
+async function updateCallerPhone(phoneNumber) {
+    if (conversationId) {
+        try {
+            const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/calls-update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                },
+                body: JSON.stringify({ 
+                    conversation_id: conversationId,
+                    caller_phone: phoneNumber,
+                    action: 'update_phone'
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to update caller phone: ${response.statusText}`);
+            }
+            
+            console.log('PCR CAD Voice AI: Caller phone updated to:', phoneNumber);
+        } catch (error) {
+            console.error('PCR CAD Voice AI: Failed to update caller phone:', error);
+        }
+    }
+}
+
 // Function to create a new call record (can be called when conversation starts)
 async function createCallRecord(callData) {
     try {
@@ -157,4 +187,5 @@ console.log('PCR CAD Voice AI: Frontend initialized and ready');
 
 // Make functions available globally for debugging/testing
 window.updateCallIntent = updateCallIntent;
+window.updateCallerPhone = updateCallerPhone;
 window.createCallRecord = createCallRecord;
