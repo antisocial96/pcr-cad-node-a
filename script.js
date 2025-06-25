@@ -139,7 +139,7 @@ async function updateCallerPhone(phoneNumber) {
 // Function to create a new call record (can be called when conversation starts)
 async function createCallRecord(callData) {
     try {
-        const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/create-call', {
+        const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/create_call', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
