@@ -17,7 +17,7 @@
     - Updates or creates call records in database
 */
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
+import { createClient } from 'npm:@supabase/supabase-js@2.39.0';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -103,10 +103,7 @@ Deno.serve(async (req: Request) => {
       return new Response(
         JSON.stringify({ status: "ElevenLabs webhook listening" }),
         {
-          headers: {
-            'Content-Type': 'application/json',
-            ...corsHeaders,
-          },
+          headers: corsHeaders,
         }
       );
     }
@@ -124,10 +121,7 @@ Deno.serve(async (req: Request) => {
           JSON.stringify({ error: 'Server configuration error: Missing SUPABASE_URL' }),
           {
             status: 500,
-            headers: {
-              'Content-Type': 'application/json',
-              ...corsHeaders,
-            },
+            headers: corsHeaders,
           }
         );
       }
@@ -138,10 +132,7 @@ Deno.serve(async (req: Request) => {
           JSON.stringify({ error: 'Server configuration error: Missing SUPABASE_SERVICE_ROLE_KEY' }),
           {
             status: 500,
-            headers: {
-              'Content-Type': 'application/json',
-              ...corsHeaders,
-            },
+            headers: corsHeaders,
           }
         );
       }
@@ -152,10 +143,7 @@ Deno.serve(async (req: Request) => {
           JSON.stringify({ error: 'Server configuration error: Missing ELEVENLABS_WEBHOOK_SECRET' }),
           {
             status: 500,
-            headers: {
-              'Content-Type': 'application/json',
-              ...corsHeaders,
-            },
+            headers: corsHeaders,
           }
         );
       }
@@ -171,10 +159,7 @@ Deno.serve(async (req: Request) => {
           JSON.stringify({ error: error }),
           {
             status: 401,
-            headers: {
-              'Content-Type': 'application/json',
-              ...corsHeaders,
-            },
+            headers: corsHeaders,
           }
         );
       }
@@ -199,10 +184,7 @@ Deno.serve(async (req: Request) => {
             JSON.stringify({ error: 'Missing conversation_id in webhook payload' }),
             {
               status: 400,
-              headers: {
-                'Content-Type': 'application/json',
-                ...corsHeaders,
-              },
+              headers: corsHeaders,
             }
           );
         }
@@ -270,10 +252,7 @@ Deno.serve(async (req: Request) => {
               }),
               {
                 status: 200,
-                headers: {
-                  'Content-Type': 'application/json',
-                  ...corsHeaders,
-                },
+                headers: corsHeaders,
               }
             );
             
@@ -308,10 +287,7 @@ Deno.serve(async (req: Request) => {
               }),
               {
                 status: 200,
-                headers: {
-                  'Content-Type': 'application/json',
-                  ...corsHeaders,
-                },
+                headers: corsHeaders,
               }
             );
           }
@@ -325,10 +301,7 @@ Deno.serve(async (req: Request) => {
             }),
             {
               status: 500,
-              headers: {
-                'Content-Type': 'application/json',
-                ...corsHeaders,
-              },
+              headers: corsHeaders,
             }
           );
         }
@@ -340,10 +313,7 @@ Deno.serve(async (req: Request) => {
         JSON.stringify({ received: true }),
         {
           status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-            ...corsHeaders,
-          },
+          headers: corsHeaders,
         }
       );
     }
@@ -353,10 +323,7 @@ Deno.serve(async (req: Request) => {
       JSON.stringify({ error: 'Method not allowed' }),
       {
         status: 405,
-        headers: {
-          'Content-Type': 'application/json',
-          ...corsHeaders,
-        },
+        headers: corsHeaders,
       }
     );
 
@@ -369,10 +336,7 @@ Deno.serve(async (req: Request) => {
       }),
       {
         status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          ...corsHeaders,
-        },
+        headers: corsHeaders,
       }
     );
   }
