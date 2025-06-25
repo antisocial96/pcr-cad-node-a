@@ -17,8 +17,7 @@
     - Updates or creates call records in database
 */
 
-import { createClient } from 'npm:@supabase/supabase-js@2.39.0';
-import { createHmac } from 'node:crypto';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,7 +25,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, elevenlabs-signature",
 };
 
-// Helper function to construct and verify webhook event
+// Helper function to construct and verify webhook event using Web Crypto API
 const constructWebhookEvent = async (req: Request, secret: string) => {
   const body = await req.text();
   const signature_header = req.headers.get('elevenlabs-signature');
@@ -50,61 +49,120 @@ const constructWebhookEvent = async (req: Request, secret: string) => {
     return { event: null, error: "Request expired" };
   }
 
-  // Validate hash
+  // Validate hash using Web Crypto API
   const message = `${timestamp}.${body}`;
 
   if (!secret) {
     return { event: null, error: "Webhook secret not configured" };
   }
 
-  const digest = "v0=" + createHmac("sha256", secret).update(message).digest("hex");
-  
-  if (signature !== digest) {
-    return { event: null, error: "Invalid signature" };
-  }
+  try {
+    // Use Web Crypto API instead of Node.js crypto
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(secret);
+    const messageData = encoder.encode(message);
+    
+    const cryptoKey = await crypto.subtle.importKey(
+      'raw',
+      keyData,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+    
+    const signature_bytes = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
+    const signature_array = new Uint8Array(signature_bytes);
+    const digest = "v0=" + Array.from(signature_array)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+    
+    if (signature !== digest) {
+      return { event: null, error: "Invalid signature" };
+    }
 
-  const event = JSON.parse(body);
-  return { event, error: null };
+    const event = JSON.parse(body);
+    return { event, error: null };
+  } catch (error) {
+    return { event: null, error: `Signature verification failed: ${error.message}` };
+  }
 };
 
 Deno.serve(async (req: Request) => {
-  // Handle CORS preflight requests
-  if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 200,
-      headers: corsHeaders,
-    });
-  }
+  try {
+    // Handle CORS preflight requests
+    if (req.method === "OPTIONS") {
+      return new Response(null, {
+        status: 200,
+        headers: corsHeaders,
+      });
+    }
 
-  // Handle GET requests for health check
-  if (req.method === "GET") {
-    return new Response(
-      JSON.stringify({ status: "ElevenLabs webhook listening" }),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          ...corsHeaders,
-        },
-      }
-    );
-  }
+    // Handle GET requests for health check
+    if (req.method === "GET") {
+      return new Response(
+        JSON.stringify({ status: "ElevenLabs webhook listening" }),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            ...corsHeaders,
+          },
+        }
+      );
+    }
 
-  // Handle POST requests (webhook events)
-  if (req.method === "POST") {
-    try {
-      // Initialize Supabase client
-      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-      const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    // Handle POST requests (webhook events)
+    if (req.method === "POST") {
+      // Initialize Supabase client with error handling
+      const supabaseUrl = Deno.env.get('SUPABASE_URL');
+      const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
       const webhookSecret = Deno.env.get('ELEVENLABS_WEBHOOK_SECRET');
 
-      if (!supabaseUrl || !supabaseServiceRoleKey) {
-        throw new Error('Missing required Supabase environment variables');
+      if (!supabaseUrl) {
+        console.error('Missing SUPABASE_URL environment variable');
+        return new Response(
+          JSON.stringify({ error: 'Server configuration error: Missing SUPABASE_URL' }),
+          {
+            status: 500,
+            headers: {
+              'Content-Type': 'application/json',
+              ...corsHeaders,
+            },
+          }
+        );
+      }
+
+      if (!supabaseServiceRoleKey) {
+        console.error('Missing SUPABASE_SERVICE_ROLE_KEY environment variable');
+        return new Response(
+          JSON.stringify({ error: 'Server configuration error: Missing SUPABASE_SERVICE_ROLE_KEY' }),
+          {
+            status: 500,
+            headers: {
+              'Content-Type': 'application/json',
+              ...corsHeaders,
+            },
+          }
+        );
+      }
+
+      if (!webhookSecret) {
+        console.error('Missing ELEVENLABS_WEBHOOK_SECRET environment variable');
+        return new Response(
+          JSON.stringify({ error: 'Server configuration error: Missing ELEVENLABS_WEBHOOK_SECRET' }),
+          {
+            status: 500,
+            headers: {
+              'Content-Type': 'application/json',
+              ...corsHeaders,
+            },
+          }
+        );
       }
 
       const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
       // Verify webhook signature
-      const { event, error } = await constructWebhookEvent(req, webhookSecret!);
+      const { event, error } = await constructWebhookEvent(req, webhookSecret);
       
       if (error) {
         console.error('Webhook verification failed:', error);
@@ -287,34 +345,34 @@ Deno.serve(async (req: Request) => {
           },
         }
       );
-      
-    } catch (error) {
-      console.error('Error processing ElevenLabs webhook:', error);
-      return new Response(
-        JSON.stringify({
-          error: 'Failed to process webhook',
-          details: error.message
-        }),
-        {
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-            ...corsHeaders,
-          },
-        }
-      );
     }
-  }
 
-  // Method not allowed
-  return new Response(
-    JSON.stringify({ error: 'Method not allowed' }),
-    {
-      status: 405,
-      headers: {
-        'Content-Type': 'application/json',
-        ...corsHeaders,
-      },
-    }
-  );
+    // Method not allowed
+    return new Response(
+      JSON.stringify({ error: 'Method not allowed' }),
+      {
+        status: 405,
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders,
+        },
+      }
+    );
+
+  } catch (globalError) {
+    console.error('Global error in webhook handler:', globalError);
+    return new Response(
+      JSON.stringify({
+        error: 'Internal server error',
+        details: globalError.message
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders,
+        },
+      }
+    );
+  }
 });
