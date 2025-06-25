@@ -6,6 +6,6 @@ app.get('/', (req, res) => {
   res.send('✅ Hello from test server!');
 });
 
-app.listen(PORT, '::', () => {
+app.listen(PORT, '::1', () => {
   console.log(`Server running on http://127.0.0.1:${PORT}`);
 });
