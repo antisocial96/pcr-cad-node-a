@@ -88,14 +88,15 @@ async function stopConversation() {
 async function updateCallIntent(intent) {
     if (conversationId) {
         try {
-            const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/update-call-intent', {
+            const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/calls-update', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ 
                     conversation_id: conversationId,
-                    intent 
+                    intent,
+                    action: 'update_intent'
                 })
             });
             
@@ -114,14 +115,15 @@ async function updateCallIntent(intent) {
 async function updateCallerPhone(phoneNumber) {
     if (conversationId) {
         try {
-            const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/update-call-phone', {
+            const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/calls-update', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ 
                     conversation_id: conversationId,
-                    caller_phone: phoneNumber 
+                    caller_phone: phoneNumber,
+                    action: 'update_phone'
                 })
             });
             
