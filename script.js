@@ -12,10 +12,7 @@ async function getSignedUrl() {
     const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/get-signed-url', {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+            'Content-Type': 'application/json'
         }
     });
     if (!response.ok) {
@@ -98,10 +95,7 @@ async function updateCallIntent(intent) {
             const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/calls-update', {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
                     conversation_id: conversationId,
@@ -128,10 +122,7 @@ async function updateCallerPhone(phoneNumber) {
             const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/calls-update', {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
                     conversation_id: conversationId,
@@ -157,10 +148,7 @@ async function createCallRecord(callData) {
         const response = await fetch('https://nbcwwdwdgxlrkbdjoyub.supabase.co/functions/v1/create_call', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(callData)
         });
