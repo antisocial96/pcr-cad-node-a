@@ -16,7 +16,7 @@ async function getSignedUrl() {
         }
     });
     if (!response.ok) {
-        throw new Error(`Failed to get signed url: ${response.statusText}`);
+        throw new Error(`Failed to get signed url outside function: ${response.statusText}`);
     }
     const { signedUrl } = await response.json();
     return signedUrl;
