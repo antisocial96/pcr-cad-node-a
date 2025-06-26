@@ -74,10 +74,10 @@ async function stopConversation() {
             conversation = null;
             conversationId = null;
             
-            // Fetch updated data after conversation ends
+            // Refresh page after conversation ends
             setTimeout(() => {
-                fetchAndDisplayCalls();
-            }, 100);
+                window.location.reload();
+            }, 1000);
         } catch (error) {
             console.error('Error ending conversation:', error);
         }
