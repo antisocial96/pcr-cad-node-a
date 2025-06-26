@@ -76,7 +76,7 @@ async function stopConversation() {
           
             // Poll Supabase every 500s for up to 5s to wait for new call
             let retries = 10;
-            const pollInterval = 1000;
+            const pollInterval = 2000;
             const poll = setInterval(async () => {
                 await fetchAndDisplayCalls();
                 if (--retries <= 0) clearInterval(poll);
