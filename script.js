@@ -124,12 +124,8 @@ function displayCalls(calls) {
         const callIdLast4 = call.conversation_id ? call.conversation_id.slice(-4) : 'N/A';
         const timestamp = call.timestamp ? new Date(call.timestamp).toLocaleString() : 'N/A';
         
-        let intentColor = '#666';
-        if (intent === 'emergency') intentColor = '#ef4444';
-        else if (intent === 'medical') intentColor = '#f59e0b';
-        else if (intent === 'fire') intentColor = '#dc2626';
-        else if (intent === 'police') intentColor = '#3b82f6';
-        else if (intent !== 'unknown') intentColor = '#ef4444';
+        // Use red for all non-unknown intents, gray for unknown
+        const intentColor = intent === 'unknown' ? '#666' : '#ef4444';
         
         return `
             <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 10px; background: #f9fafb;">
