@@ -86,9 +86,6 @@ async function stopConversation() {
 
 async function fetchAndDisplayCalls() {
     try {
-        // Refresh the page
-        location.reload();
-        
         const response = await fetch('http://localhost:3001/api/calls');
         
         if (!response.ok) {
