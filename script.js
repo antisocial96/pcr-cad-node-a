@@ -8,6 +8,7 @@ const callsContainer = document.getElementById('callsContainer');
 
 let conversation;
 let conversationId = null;
+let mediaStream = null;
 
 async function getSignedUrl() {
     try {
@@ -25,7 +26,7 @@ async function getSignedUrl() {
 
 async function startConversation() {
     try {
-        await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const signedUrl = await getSignedUrl();
 
         conversation = await Conversation.startSession({
@@ -73,6 +74,14 @@ async function stopConversation() {
             await conversation.endSession();
             conversation = null;
             conversationId = null;
+            
+            // Turn off microphone
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => {
+                    track.stop();
+                });
+                mediaStream = null;
+            }
           
             // Poll Supabase every 500s for up to 5s to wait for new call
             let retries = 10;
