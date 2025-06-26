@@ -73,11 +73,14 @@ async function stopConversation() {
             await conversation.endSession();
             conversation = null;
             conversationId = null;
-            
-            // Refresh page after conversation ends
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
+          
+            // Poll Supabase every 500s for up to 5s to wait for new call
+            let retries = 10;
+            const pollInterval = 1000;
+            const poll = setInterval(async () => {
+                await fetchAndDisplayCalls();
+                if (--retries <= 0) clearInterval(poll);
+            }, pollInterval);
         } catch (error) {
             console.error('Error ending conversation:', error);
         }
