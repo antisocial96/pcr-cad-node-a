@@ -86,14 +86,6 @@ async function stopConversation() {
 
 async function fetchAndDisplayCalls() {
     try {
-        // Reset app to default state
-        connectionStatus.textContent = 'Disconnected';
-        connectionStatus.style.color = '#ef4444';
-        agentStatus.textContent = 'listening';
-        agentStatus.style.color = '#10b981';
-        startButton.disabled = false;
-        stopButton.disabled = true;
-        
         const response = await fetch('http://localhost:3001/api/calls');
         
         if (!response.ok) {
