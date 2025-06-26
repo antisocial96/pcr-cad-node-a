@@ -8,7 +8,6 @@ const callsContainer = document.getElementById('callsContainer');
 
 let conversation;
 let conversationId = null;
-let refreshInterval = null;
 
 async function getSignedUrl() {
     try {
@@ -40,9 +39,6 @@ async function startConversation() {
                 if (conversation && conversation.conversationId) {
                     conversationId = conversation.conversationId;
                     console.log('Connected with conversation ID:', conversationId);
-                    
-                    // Start periodic refresh while connected
-                    startPeriodicRefresh();
                 }
             },
             onDisconnect: () => {
@@ -51,10 +47,6 @@ async function startConversation() {
                 startButton.disabled = false;
                 stopButton.disabled = true;
                 conversationId = null;
-                
-                // Stop periodic refresh and do final update
-                stopPeriodicRefresh();
-                fetchAndDisplayCalls();
             },
             onError: (error) => {
                 console.error('Conversation error:', error);
@@ -62,7 +54,6 @@ async function startConversation() {
                 connectionStatus.style.color = '#ef4444';
                 startButton.disabled = false;
                 stopButton.disabled = true;
-                stopPeriodicRefresh();
             },
             onModeChange: (mode) => {
                 agentStatus.textContent = mode.mode === 'speaking' ? 'speaking' : 'listening';
@@ -82,26 +73,14 @@ async function stopConversation() {
             await conversation.endSession();
             conversation = null;
             conversationId = null;
+            
+            // Fetch updated data 100ms after stop button is clicked
+            setTimeout(async () => {
+                await fetchAndDisplayCalls();
+            }, 100);
         } catch (error) {
             console.error('Error ending conversation:', error);
         }
-    }
-}
-
-function startPeriodicRefresh() {
-    // Clear any existing interval
-    stopPeriodicRefresh();
-    
-    // Refresh every 5 seconds while connected
-    refreshInterval = setInterval(() => {
-        fetchAndDisplayCalls();
-    }, 5000);
-}
-
-function stopPeriodicRefresh() {
-    if (refreshInterval) {
-        clearInterval(refreshInterval);
-        refreshInterval = null;
     }
 }
 
@@ -177,9 +156,6 @@ function displayCalls(calls) {
 
 startButton.addEventListener('click', startConversation);
 stopButton.addEventListener('click', stopConversation);
-
-// Clean up interval on page unload
-window.addEventListener('beforeunload', stopPeriodicRefresh);
 
 // Load initial call records
 fetchAndDisplayCalls();
