@@ -76,9 +76,8 @@ async function stopConversation() {
             
             // Refresh the page after conversation ends
             setTimeout(() => {
-                //window.location.reload();
-              fetchAndDisplayCalls();
-            }, 500);
+                fetchAndDisplayCalls();
+            }, 2000);
         } catch (error) {
             console.error('Error ending conversation:', error);
         }
@@ -87,7 +86,16 @@ async function stopConversation() {
 
 async function fetchAndDisplayCalls() {
     try {
-        const response = await fetch('http://localhost:3001/api/calls');
+        // Add cache-busting parameter to ensure fresh data
+        const timestamp = new Date().getTime();
+        const response = await fetch(`http://localhost:3001/api/calls?_t=${timestamp}`, {
+            cache: 'no-cache',
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        });
         
         if (!response.ok) {
             throw new Error(`Failed to fetch calls: ${response.statusText}`);
@@ -95,6 +103,14 @@ async function fetchAndDisplayCalls() {
         
         const calls = await response.json();
         displayCalls(calls);
+        
+        // Reset app to default state after displaying calls
+        connectionStatus.textContent = 'Disconnected';
+        connectionStatus.style.color = '#ef4444';
+        agentStatus.textContent = 'listening';
+        agentStatus.style.color = '#10b981';
+        startButton.disabled = false;
+        stopButton.disabled = true;
         
     } catch (error) {
         console.error('Failed to fetch call records:', error);
