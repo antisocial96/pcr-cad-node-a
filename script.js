@@ -74,32 +74,17 @@ async function stopConversation() {
             conversation = null;
             conversationId = null;
             
-            // Fetch updated data 100ms after stop button is clicked, then refresh UI 5ms later
-            setTimeout(async () => {
-                try {
-                    const calls = await fetchCallData();
-                    // Wait 5ms after data is fetched, then refresh UI
-                    setTimeout(() => {
-                        displayCalls(calls);
-                    }, 5);
-                } catch (error) {
-                    console.error('Failed to fetch updated call data:', error);
-                    // Still refresh UI even if fetch fails, to show current state
-                    setTimeout(() => {
-                        fetchAndDisplayCalls();
-                    }, 5);
-                }
+            // Fetch updated data after conversation ends
+            setTimeout(() => {
+                fetchAndDisplayCalls();
             }, 100);
         } catch (error) {
             console.error('Error ending conversation:', error);
-            // Reset UI state even if ending conversation fails
-            conversation = null;
-            conversationId = null;
         }
     }
 }
 
-async function fetchCallData() {
+async function fetchAndDisplayCalls() {
     try {
         const response = await fetch('http://localhost:3001/api/calls');
         
@@ -108,17 +93,6 @@ async function fetchCallData() {
         }
         
         const calls = await response.json();
-        return calls;
-        
-    } catch (error) {
-        console.error('Failed to fetch call records:', error);
-        throw error;
-    }
-}
-
-async function fetchAndDisplayCalls() {
-    try {
-        const calls = await fetchCallData();
         displayCalls(calls);
         
     } catch (error) {
@@ -150,15 +124,19 @@ function displayCalls(calls) {
         const callIdLast4 = call.conversation_id ? call.conversation_id.slice(-4) : 'N/A';
         const timestamp = call.timestamp ? new Date(call.timestamp).toLocaleString() : 'N/A';
         
-        // Simple color scheme: red for any intent value, gray for unknown
-        const intentColor = intent === 'unknown' ? '#666' : '#ef4444';
+        let intentColor = '#666';
+        if (intent === 'emergency') intentColor = '#ef4444';
+        else if (intent === 'medical') intentColor = '#f59e0b';
+        else if (intent === 'fire') intentColor = '#dc2626';
+        else if (intent === 'police') intentColor = '#3b82f6';
+        else if (intent !== 'unknown') intentColor = '#ef4444';
         
         return `
             <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 10px; background: #f9fafb;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <strong style="color: #374151;">Call ID: ...${callIdLast4}</strong>
                     <span style="background: ${intentColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">
-                        ${intent}
+                        ${intent.toUpperCase()}
                     </span>
                 </div>
                 <div style="color: #6b7280; font-size: 12px;">
