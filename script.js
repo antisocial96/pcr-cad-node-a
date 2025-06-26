@@ -84,18 +84,6 @@ async function stopConversation() {
     }
 }
 
-function resetAppState() {
-    // Reset app functionality to default state
-    connectionStatus.textContent = 'Disconnected';
-    connectionStatus.style.color = '#ef4444';
-    agentStatus.textContent = 'listening';
-    agentStatus.style.color = '#10b981';
-    startButton.disabled = false;
-    stopButton.disabled = true;
-    conversation = null;
-    conversationId = null;
-}
-
 async function fetchAndDisplayCalls() {
     try {
         // Add cache-busting parameter to ensure fresh data
@@ -115,9 +103,6 @@ async function fetchAndDisplayCalls() {
         
         const calls = await response.json();
         displayCalls(calls);
-        
-        // Reset app functionality after displaying calls
-        resetAppState();
         
     } catch (error) {
         console.error('Failed to fetch call records:', error);
