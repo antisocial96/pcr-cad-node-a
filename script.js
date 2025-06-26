@@ -76,8 +76,9 @@ async function stopConversation() {
             
             // Refresh the page after conversation ends
             setTimeout(() => {
-                fetchAndDisplayCalls();
-            }, 2000);
+                //window.location.reload();
+              fetchAndDisplayCalls();
+            }, 500);
         } catch (error) {
             console.error('Error ending conversation:', error);
         }
@@ -86,16 +87,7 @@ async function stopConversation() {
 
 async function fetchAndDisplayCalls() {
     try {
-        // Add cache-busting parameter to ensure fresh data
-        const timestamp = new Date().getTime();
-        const response = await fetch(`http://localhost:3001/api/calls?_t=${timestamp}`, {
-            cache: 'no-cache',
-            headers: {
-                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Pragma': 'no-cache',
-                'Expires': '0'
-            }
-        });
+        const response = await fetch('http://localhost:3001/api/calls');
         
         if (!response.ok) {
             throw new Error(`Failed to fetch calls: ${response.statusText}`);
