@@ -78,7 +78,7 @@ async function stopConversation() {
             setTimeout(() => {
                 //window.location.reload();
               fetchAndDisplayCalls();
-            }, 2000);
+            }, 500);
         } catch (error) {
             console.error('Error ending conversation:', error);
         }
