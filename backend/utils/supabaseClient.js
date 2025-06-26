@@ -17,7 +17,8 @@ export const garudaSentryCalls = {
     const { data, error } = await supabase
       .from('garuda_sentry_calls')
       .select('*')
-      .order('timestamp', { ascending: false });
+      .order('timestamp', { ascending: false })
+      .limit(50); // Reasonable limit for performance
     
     if (error) {
       console.error('Error fetching calls:', error);

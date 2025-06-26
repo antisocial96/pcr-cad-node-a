@@ -115,11 +115,14 @@ function displayCalls(calls) {
         return;
     }
     
-    const recentCalls = calls.slice(0, 2);
+    // Sort by timestamp descending to ensure most recent calls first
+    const sortedCalls = calls.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    const recentCalls = sortedCalls.slice(0, 2);
     
     const callsHtml = recentCalls.map(call => {
         const intent = call.intent || 'unknown';
         const callIdLast4 = call.conversation_id ? call.conversation_id.slice(-4) : 'N/A';
+        const timestamp = call.timestamp ? new Date(call.timestamp).toLocaleString() : 'N/A';
         
         let intentColor = '#666';
         if (intent === 'emergency') intentColor = '#ef4444';
@@ -135,6 +138,9 @@ function displayCalls(calls) {
                     <span style="background: ${intentColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">
                         ${intent.toUpperCase()}
                     </span>
+                </div>
+                <div style="color: #6b7280; font-size: 12px;">
+                    ${timestamp}
                 </div>
             </div>
         `;
