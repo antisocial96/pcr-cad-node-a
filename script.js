@@ -74,7 +74,7 @@ async function stopConversation() {
             conversation = null;
             conversationId = null;
             
-            // Poll Supabase every 1s for up to 5s to wait for new call
+            // Poll Supabase every 500s for up to 5s to wait for new call
             let retries = 10;
             const pollInterval = 500;
             const poll = setInterval(async () => {
