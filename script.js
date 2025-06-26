@@ -74,9 +74,13 @@ async function stopConversation() {
             conversation = null;
             conversationId = null;
             
-            // Fetch updated data 100ms after stop button is clicked
+            // Fetch updated data 100ms after stop button is clicked, then refresh UI 5ms later
             setTimeout(async () => {
-                await fetchAndDisplayCalls();
+                const calls = await fetchCallData();
+                // Wait 5ms after data is fetched, then refresh UI
+                setTimeout(() => {
+                    displayCalls(calls);
+                }, 5);
             }, 100);
         } catch (error) {
             console.error('Error ending conversation:', error);
@@ -84,7 +88,7 @@ async function stopConversation() {
     }
 }
 
-async function fetchAndDisplayCalls() {
+async function fetchCallData() {
     try {
         const response = await fetch('http://localhost:3001/api/calls');
         
@@ -93,6 +97,17 @@ async function fetchAndDisplayCalls() {
         }
         
         const calls = await response.json();
+        return calls;
+        
+    } catch (error) {
+        console.error('Failed to fetch call records:', error);
+        throw error;
+    }
+}
+
+async function fetchAndDisplayCalls() {
+    try {
+        const calls = await fetchCallData();
         displayCalls(calls);
         
     } catch (error) {
