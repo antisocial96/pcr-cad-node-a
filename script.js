@@ -104,14 +104,6 @@ async function fetchAndDisplayCalls() {
         const calls = await response.json();
         displayCalls(calls);
         
-        // Reset app to default state after displaying calls
-        connectionStatus.textContent = 'Disconnected';
-        connectionStatus.style.color = '#ef4444';
-        agentStatus.textContent = 'listening';
-        agentStatus.style.color = '#10b981';
-        startButton.disabled = false;
-        stopButton.disabled = true;
-        
     } catch (error) {
         console.error('Failed to fetch call records:', error);
         callsContainer.innerHTML = `
