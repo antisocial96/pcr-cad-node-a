@@ -129,7 +129,7 @@ function displayCalls(calls) {
         else if (intent === 'medical') intentColor = '#f59e0b';
         else if (intent === 'fire') intentColor = '#dc2626';
         else if (intent === 'police') intentColor = '#3b82f6';
-        else if (intent !== 'unknown') intentColor = '#10b981';
+        else if (intent !== 'unknown') intentColor = '#ef4444';
         
         return `
             <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 10px; background: #f9fafb;">
