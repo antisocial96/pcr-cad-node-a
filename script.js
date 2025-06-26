@@ -74,13 +74,10 @@ async function stopConversation() {
             conversation = null;
             conversationId = null;
             
-            // Poll Supabase every 500s for up to 5s to wait for new call
-            let retries = 10;
-            const pollInterval = 500;
-            const poll = setInterval(async () => {
-                await fetchAndDisplayCalls();
-                if (--retries <= 0) clearInterval(poll);
-            }, pollInterval);
+            // Fetch updated data after conversation ends
+            setTimeout(() => {
+                fetchAndDisplayCalls();
+            }, 100);
         } catch (error) {
             console.error('Error ending conversation:', error);
         }
