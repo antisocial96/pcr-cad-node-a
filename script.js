@@ -76,14 +76,25 @@ async function stopConversation() {
             
             // Fetch updated data 100ms after stop button is clicked, then refresh UI 5ms later
             setTimeout(async () => {
-                const calls = await fetchCallData();
-                // Wait 5ms after data is fetched, then refresh UI
-                setTimeout(() => {
-                    displayCalls(calls);
-                }, 5);
+                try {
+                    const calls = await fetchCallData();
+                    // Wait 5ms after data is fetched, then refresh UI
+                    setTimeout(() => {
+                        displayCalls(calls);
+                    }, 5);
+                } catch (error) {
+                    console.error('Failed to fetch updated call data:', error);
+                    // Still refresh UI even if fetch fails, to show current state
+                    setTimeout(() => {
+                        fetchAndDisplayCalls();
+                    }, 5);
+                }
             }, 100);
         } catch (error) {
             console.error('Error ending conversation:', error);
+            // Reset UI state even if ending conversation fails
+            conversation = null;
+            conversationId = null;
         }
     }
 }
