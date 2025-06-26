@@ -77,7 +77,7 @@ async function stopConversation() {
             // Fetch updated data after conversation ends
             setTimeout(() => {
                 fetchAndDisplayCalls();
-            }, 100);
+            }, 105);
         } catch (error) {
             console.error('Error ending conversation:', error);
         }
