@@ -77,6 +77,7 @@ async function stopConversation() {
             // Refresh the page after conversation ends
             setTimeout(() => {
                 //window.location.reload();
+              console.log("timeout function working")
               fetchAndDisplayCalls();
             }, 500);
         } catch (error) {
